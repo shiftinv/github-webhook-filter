@@ -15,14 +15,14 @@ repos:
         name: deno-fmt
         entry: deno fmt -q
         language: system
-        types_or: [javascript, jsx, ts, tsx, json, markdown]
+        types_or: [javascript, jsx, ts, tsx]
       - id: deno-lint
         name: deno-lint
         entry: deno lint -q
         language: system
-        types_or: [javascript, jsx, ts, tsx, json, markdown]
+        types_or: [javascript, jsx, ts, tsx]
       - id: deno-check
         name: deno-check
         entry: deno check -q
         language: system
-        types_or: [javascript, jsx, ts, tsx, json, markdown]
+        types_or: [javascript, jsx, ts, tsx]
