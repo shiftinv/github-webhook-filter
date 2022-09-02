@@ -21,3 +21,8 @@ repos:
         entry: deno lint -q
         language: system
         types_or: [javascript, jsx, ts, tsx, json, markdown]
+      - id: deno-check
+        name: deno-check
+        entry: deno check -q
+        language: system
+        types_or: [javascript, jsx, ts, tsx, json, markdown]
