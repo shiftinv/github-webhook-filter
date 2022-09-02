@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+
+  - repo: local
+    hooks:
+      - id: deno-fmt
+        name: deno-fmt
+        entry: deno fmt -q
+        language: system
+        types_or: [javascript, jsx, ts, tsx, json, markdown]
+      - id: deno-lint
+        name: deno-lint
+        entry: deno lint -q
+        language: system
+        types_or: [javascript, jsx, ts, tsx, json, markdown]
