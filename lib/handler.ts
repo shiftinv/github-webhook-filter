@@ -48,6 +48,9 @@ function getUrlConfig(params: URLSearchParams): UrlConfig {
             case "hideTags":
                 config.hideTags = util.parseBool(value);
                 break;
+            case "commentBurstLimit":
+                config.commentBurstLimit = parseInt(value);
+                break;
             default:
                 throw http.createHttpError(418, `Unknown config option: ${key}`);
         }

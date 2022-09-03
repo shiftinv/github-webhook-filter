@@ -1,7 +1,11 @@
+import { log, TTL } from "../deps.ts";
 import { UrlConfig } from "./types.d.ts";
+
+const reviewComments = new TTL<number>(2 * 1000);
 
 export default function filter(headers: Headers, json: any, config: UrlConfig): string | null {
     const event = headers.get("x-github-event") || "unknown";
+    const login: string | undefined = json.sender?.login?.toLowerCase();
 
     // ignore events that Discord won't render anyway
     if (["status", "pull_request_review_thread"].includes(event)) {
@@ -32,8 +36,25 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
         else if (json.review?.state === "commented" && !json.review?.body) return "empty PR review";
     }
 
+    // ignore some PR comment events
+    if (event === "pull_request_review_comment") {
+        // ignore edit/delete actions
+        if (json.action !== "created") return "no-op PR comment action";
+        // check if more than x comments on a PR review in a short timespan
+        const reviewId: number = json.comment?.pull_request_review_id;
+        if (config.commentBurstLimit && reviewId) {
+            const cacheKey = `${reviewId}-${login}`;
+            log.debug(`filter: checking cache key ${cacheKey}`);
+            log.debug(`filter: full comment cache ${JSON.stringify(Array.from(reviewComments))}`);
+            const curr = reviewComments.get(cacheKey);
+            if (curr && curr >= config.commentBurstLimit) {
+                return `exceeded comment burst limit ${config.commentBurstLimit} for review ${reviewId}`;
+            }
+            reviewComments.set(cacheKey, (curr ?? 0) + 1);
+        }
+    }
+
     // ignore bots
-    const login: string | undefined = json.sender?.login?.toLowerCase();
     if (
         login &&
         ["coveralls[bot]", "netlify[bot]", "pre-commit-ci[bot]"].some((n) => login.includes(n))
