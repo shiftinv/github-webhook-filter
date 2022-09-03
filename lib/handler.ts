@@ -2,7 +2,7 @@ import { http, log } from "../deps.ts";
 import { verify } from "./crypto.ts";
 import filterWebhook from "./filter.ts";
 import { UrlConfig } from "./types.d.ts";
-import * as util from "./util.ts";
+import { parseBool } from "./util.ts";
 import { sendWebhook } from "./webhook.ts";
 
 export default async function handle(req: Request): Promise<Response> {
@@ -48,7 +48,7 @@ function getUrlConfig(params: URLSearchParams): UrlConfig {
                 config.allowBranches = value.split(",");
                 break;
             case "hideTags":
-                config.hideTags = util.parseBool(value);
+                config.hideTags = parseBool(value);
                 break;
             case "commentBurstLimit":
                 config.commentBurstLimit = parseInt(value);

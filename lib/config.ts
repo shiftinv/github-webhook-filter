@@ -1,4 +1,4 @@
-import * as util from "./util.ts";
+import { parseBool } from "./util.ts";
 
 function get(key: string, def?: string): string {
     const value = Deno.env.get(key) ?? def;
@@ -9,7 +9,7 @@ function get(key: string, def?: string): string {
 }
 
 export default {
-    debug: util.parseBool(get("DEBUG", "0")),
+    debug: parseBool(get("DEBUG", "0")),
     hostname: get("HOSTNAME", "127.0.0.1"),
     port: parseInt(get("PORT", "8080")),
     signKey: get("SIGN_KEY"),

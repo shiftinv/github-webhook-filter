@@ -1,6 +1,6 @@
 import { log } from "../deps.ts";
 import config from "./config.ts";
-import * as util from "./util.ts";
+import { sleep } from "./util.ts";
 
 export async function sendWebhook(
     id: string,
@@ -35,7 +35,7 @@ export async function sendWebhook(
 
         // wait and try again
         log.warning(`retrying after ${resetms}ms`);
-        await util.sleep(resetms);
+        await sleep(resetms);
         retries++;
     } while (retries <= config.maxWebhookRetries);
     return res;
