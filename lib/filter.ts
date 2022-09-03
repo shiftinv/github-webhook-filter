@@ -10,19 +10,19 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
         event === "pull_request" && json.action &&
         !["opened", "closed", "reopened"].includes(json.action)
     ) {
-        return "no-op PR event";
+        return "no-op PR action";
     }
 
     if (
         event === "issues" && json.action &&
         !["opened", "deleted", "closed", "reopened", "transferred"].includes(json.action)
     ) {
-        return "no-op issue event";
+        return "no-op issue action";
     }
 
     if (event === "pull_request_review") {
         // ignore edit/dismiss actions
-        if (json.action !== "submitted") return "no-op PR review event";
+        if (json.action !== "submitted") return "no-op PR review action";
         // if comment (not approval or changes requested), ignore empty review body
         else if (json.review?.state === "commented" && !json.review?.body) return "empty PR review";
     }
