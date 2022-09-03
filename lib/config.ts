@@ -13,4 +13,6 @@ export default {
     hostname: get("HOSTNAME", "127.0.0.1"),
     port: parseInt(get("PORT", "8080")),
     signKey: get("SIGN_KEY"),
+    maxWebhookRetries: parseInt(get("MAX_RETRIES", "3")),
+    maxWebhookRetryMs: parseInt(get("MAX_RETRY_MS", "30000")),
 };
