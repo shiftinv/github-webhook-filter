@@ -1,7 +1,25 @@
 import { UrlConfig } from "./types.d.ts";
 
 export default function filter(headers: Headers, json: any, config: UrlConfig): string | null {
-    const event = headers.get("x-github-event");
+    const event = headers.get("x-github-event") || "unknown";
+    if (["status", "pull_request_review_thread"].includes(event)) {
+        return event;
+    }
+
+    if (
+        event === "pull_request" && json.action &&
+        !["opened", "closed", "reopened"].includes(json.action)
+    ) {
+        return "no-op PR event";
+    }
+
+    if (
+        event === "issues" && json.action &&
+        !["opened", "deleted", "closed", "reopened", "transferred"].includes(json.action)
+    ) {
+        return "no-op issue event";
+    }
+
     const login: string | undefined = json.sender?.login?.toLowerCase();
     if (
         login &&
