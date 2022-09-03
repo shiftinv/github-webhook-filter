@@ -1,6 +1,7 @@
 import { http, log } from "../deps.ts";
 import { verify } from "./crypto.ts";
 import filterWebhook from "./filter.ts";
+import { UrlConfig } from "./types.d.ts";
 import * as util from "./util.ts";
 
 export default async function handle(req: Request): Promise<Response> {

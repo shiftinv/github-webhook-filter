@@ -1,4 +1,4 @@
-interface UrlConfig {
+export interface UrlConfig {
     allowBranches?: string[];
     hideTags?: boolean;
 }
