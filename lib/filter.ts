@@ -20,6 +20,11 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
         return "no-op issue event";
     }
 
+    if (event === "pull_request_review") {
+        if (json.action !== "submitted") return "no-op PR review event";
+        else if (json.review?.body === null) return "empty PR review";
+    }
+
     const login: string | undefined = json.sender?.login?.toLowerCase();
     if (
         login &&
