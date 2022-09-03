@@ -14,14 +14,14 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
     if (event === "push" && refMatch) {
         // check if branch is allowed
         if (
-            refMatch[0] == "heads" && config.allowBranches !== undefined &&
-            !config.allowBranches.includes(refMatch[1])
+            refMatch[1] == "heads" && config.allowBranches !== undefined &&
+            !config.allowBranches.includes(refMatch[2])
         ) {
-            return `branch '${refMatch[1]}' not in ${JSON.stringify(config.allowBranches)}`;
+            return `branch '${refMatch[2]}' not in ${JSON.stringify(config.allowBranches)}`;
         }
 
         // check if it's a tag
-        if (refMatch[0] == "tags" && config.hideTags === true) {
+        if (refMatch[1] == "tags" && config.hideTags === true) {
             return "tag";
         }
     }
