@@ -1,4 +1,4 @@
-import { http } from "../deps.ts";
+import { http, log } from "../deps.ts";
 import { verify } from "./crypto.ts";
 import filterWebhook from "./filter.ts";
 import { UrlConfig } from "./types.d.ts";
@@ -31,6 +31,7 @@ export default async function handle(req: Request): Promise<Response> {
     // do the thing
     const filterReason = filterWebhook(req.headers, json, urlConfig);
     if (filterReason !== null) {
+        log.debug(`handler: ignored due to '${filterReason}'`);
         return new Response(`Ignored by webhook filter (reason: ${filterReason})`, { status: 203 });
     }
 
