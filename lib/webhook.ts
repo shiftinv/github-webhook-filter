@@ -33,10 +33,11 @@ export async function sendWebhook(
         // if we'd wait longer than the configured limit, just return the 429
         if (resetms > config.maxWebhookRetryMs) break;
 
-        // wait and try again
-        log.warning(`retrying after ${resetms}ms`);
-        await sleep(resetms);
+        // maybe wait and retry
+        if (retries >= config.maxWebhookRetries) break;
         retries++;
-    } while (retries <= config.maxWebhookRetries);
+        log.warning(`retrying after ${resetms}ms (retry ${retries})`);
+        await sleep(resetms);
+    } while (true);
     return res;
 }
