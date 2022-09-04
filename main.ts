@@ -2,19 +2,21 @@ import { http, log } from "./deps.ts";
 import config from "./lib/config.ts";
 import handler from "./lib/handler.ts";
 
-await log.setup({
-    handlers: {
-        console: new log.handlers.ConsoleHandler("DEBUG", {
-            formatter: (rec) => `${rec.datetime.toISOString()} [${rec.levelName}] ${rec.msg}`,
-        }),
-    },
-    loggers: {
-        default: {
-            level: config.debug ? "DEBUG" : "INFO",
-            handlers: ["console"],
+async function setupLogs(): Promise<void> {
+    await log.setup({
+        handlers: {
+            console: new log.handlers.ConsoleHandler("DEBUG", {
+                formatter: (rec) => `${rec.datetime.toISOString()} [${rec.levelName}] ${rec.msg}`,
+            }),
         },
-    },
-});
+        loggers: {
+            default: {
+                level: config.debug ? "DEBUG" : "INFO",
+                handlers: ["console"],
+            },
+        },
+    });
+}
 
 async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Response> {
     let resp: Response;
@@ -39,8 +41,12 @@ async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Res
     return resp;
 }
 
-log.info(`Starting webserver on ${config.hostname}:${config.port}`);
-http.serve(handleRequest, {
-    hostname: config.hostname,
-    port: config.port,
-});
+if (import.meta.main) {
+    setupLogs();
+
+    log.info(`starting webserver on ${config.hostname}:${config.port}`);
+    http.serve(handleRequest, {
+        hostname: config.hostname,
+        port: config.port,
+    });
+}
