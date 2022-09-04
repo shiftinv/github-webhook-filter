@@ -16,4 +16,5 @@ export default {
     signKey: get("SIGN_KEY", null),
     maxWebhookRetries: parseInt(get("MAX_RETRIES", "3")),
     maxWebhookRetryMs: parseInt(get("MAX_RETRY_MS", "30000")),
+    mainRedirect: get("MAIN_REDIRECT", null),
 };

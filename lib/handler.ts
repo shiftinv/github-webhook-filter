@@ -1,4 +1,5 @@
 import { http, log } from "../deps.ts";
+import config from "./config.ts";
 import { hasKey, verify } from "./crypto.ts";
 import filterWebhook from "./filter.ts";
 import { UrlConfig } from "./types.d.ts";
@@ -6,12 +7,19 @@ import { parseBool } from "./util.ts";
 import { sendWebhook } from "./webhook.ts";
 
 export default async function handle(req: Request): Promise<Response> {
+    const url = new URL(req.url);
+
+    // redirect to repo if `GET /`
+    if (req.method === "GET" && config.mainRedirect && url.pathname === "/") {
+        return Response.redirect(config.mainRedirect);
+    }
+
+    // everything else should be a POST
     if (req.method !== "POST") {
         throw http.createHttpError(405);
     }
 
     // split url into parts
-    const url = new URL(req.url);
     const [, id, token] = url.pathname.split("/");
     if (!id || !token) {
         throw http.createHttpError(400);
