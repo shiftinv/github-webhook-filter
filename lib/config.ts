@@ -1,10 +1,11 @@
 import { parseBool } from "./util.ts";
 
-function get(key: string, def?: string): string {
-    const value = Deno.env.get(key) ?? def;
-    if (value !== undefined) {
-        return value;
-    }
+function get(key: string): string;
+function get<T>(key: string, def: T): string | T;
+function get<T>(key: string, def?: T): string | T {
+    const value = Deno.env.get(key);
+    if (value !== undefined) return value;
+    else if (def !== undefined) return def;
     throw new Error(`Missing environment variable '${key}'.`);
 }
 
