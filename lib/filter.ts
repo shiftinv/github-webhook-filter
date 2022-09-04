@@ -17,7 +17,7 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
         event === "pull_request" && json.action &&
         !["opened", "closed", "reopened"].includes(json.action)
     ) {
-        return "no-op PR action";
+        return `no-op PR action '${json.action}'`;
     }
 
     // ignore all issue actions except "opened", "deleted", "closed", "reopened", "transferred"
@@ -25,13 +25,13 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
         event === "issues" && json.action &&
         !["opened", "deleted", "closed", "reopened", "transferred"].includes(json.action)
     ) {
-        return "no-op issue action";
+        return `no-op issue action '${json.action}'`;
     }
 
     // ignore some PR review actions
     if (event === "pull_request_review") {
         // ignore edit/dismiss actions
-        if (json.action !== "submitted") return "no-op PR review action";
+        if (json.action !== "submitted") return `no-op PR review action '${json.action}'`;
         // if comment (not approval or changes requested), ignore empty review body
         else if (json.review?.state === "commented" && !json.review?.body) return "empty PR review";
     }
@@ -39,7 +39,7 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
     // ignore some PR comment events
     if (event === "pull_request_review_comment") {
         // ignore edit/delete actions
-        if (json.action !== "created") return "no-op PR comment action";
+        if (json.action !== "created") return `no-op PR comment action '${json.action}'`;
         // check if more than x comments on a PR review in a short timespan
         const reviewId: number = json.comment?.pull_request_review_id;
         if (config.commentBurstLimit && reviewId) {
@@ -73,7 +73,7 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
 
         // check if it's a tag
         if (refMatch[1] == "tags" && config.hideTags === true) {
-            return "tag";
+            return `tag '${refMatch[2]}'`;
         }
     }
 
