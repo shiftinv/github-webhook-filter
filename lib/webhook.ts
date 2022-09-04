@@ -29,7 +29,13 @@ export async function sendWebhook(
         // should always exist, even for cf bans, but checking anyway
         if (reset === null) break;
 
-        const resetms = parseFloat(reset);
+        // parse retry delay
+        let resetms = parseFloat(reset);
+        if (!res.headers.has("via")) {
+            // if there's no `via` header, this is likely a cf ban, which uses seconds instead of milliseconds
+            resetms *= 1000;
+        }
+
         // if we'd wait longer than the configured limit, just return the 429
         if (resetms > config.maxWebhookRetryMs) {
             log.warning(
