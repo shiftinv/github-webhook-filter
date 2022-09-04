@@ -44,6 +44,10 @@ async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Res
 if (import.meta.main) {
     setupLogs();
 
+    if (!config.signKey) {
+        log.warning("url signing disabled");
+    }
+
     log.info(`starting webserver on ${config.hostname}:${config.port}`);
     http.serve(handleRequest, {
         hostname: config.hostname,

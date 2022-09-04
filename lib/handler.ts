@@ -1,5 +1,5 @@
 import { http, log } from "../deps.ts";
-import { verify } from "./crypto.ts";
+import { hasKey, verify } from "./crypto.ts";
 import filterWebhook from "./filter.ts";
 import { UrlConfig } from "./types.d.ts";
 import { parseBool } from "./util.ts";
@@ -13,14 +13,15 @@ export default async function handle(req: Request): Promise<Response> {
     // split url into parts
     const url = new URL(req.url);
     const [, id, token] = url.pathname.split("/");
-    const signature = url.searchParams.get("sig");
-    if (!id || !token || !signature) {
+    if (!id || !token) {
         throw http.createHttpError(400);
     }
 
     // verify signature
-    if (!(await verify(`${id}/${token}`, signature))) {
-        throw http.createHttpError(403);
+    if (hasKey) {
+        const signature = url.searchParams.get("sig");
+        if (!signature) throw http.createHttpError(400);
+        if (!(await verify(`${id}/${token}`, signature))) throw http.createHttpError(403);
     }
 
     // extract data
