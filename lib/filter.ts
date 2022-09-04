@@ -46,7 +46,7 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
             const cacheKey = `${reviewId}-${login}`;
             const curr = reviewComments.get(cacheKey);
             if (curr && curr >= config.commentBurstLimit) {
-                return `exceeded comment burst limit ${config.commentBurstLimit} for review ${reviewId}`;
+                return `exceeded comment burst limit (${config.commentBurstLimit}) for review ${reviewId}`;
             }
             reviewComments.set(cacheKey, (curr ?? 0) + 1);
         }
