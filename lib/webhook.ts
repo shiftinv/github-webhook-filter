@@ -31,10 +31,18 @@ export async function sendWebhook(
 
         const resetms = parseFloat(reset);
         // if we'd wait longer than the configured limit, just return the 429
-        if (resetms > config.maxWebhookRetryMs) break;
+        if (resetms > config.maxWebhookRetryMs) {
+            log.warning(
+                `ratelimited for ${resetms}ms (> ${config.maxWebhookRetryMs}ms), not retrying`,
+            );
+            break;
+        }
 
         // maybe wait and retry
-        if (retries >= config.maxWebhookRetries) break;
+        if (retries >= config.maxWebhookRetries) {
+            log.warning(`reached maximum number of retries (${retries})`);
+            break;
+        }
         retries++;
         log.warning(`retrying after ${resetms}ms (retry ${retries})`);
         await sleep(resetms);
