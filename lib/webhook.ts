@@ -47,5 +47,23 @@ export async function sendWebhook(
         log.warning(`retrying after ${resetms}ms (retry ${retries})`);
         await sleep(resetms);
     } while (true);
+
+    // clone response to make headers mutable
+    res = new Response(res.body, res);
+
+    // set metadata headers
+    const meta: Record<string, string> = {
+        "deploy": config.deployId,
+    };
+    if (retries) meta["retries"] = retries.toString();
+
+    setMetadata(res, meta);
+
     return res;
+}
+
+function setMetadata(res: Response, meta: Record<string, string>): void {
+    for (const [key, value] of Object.entries(meta)) {
+        res.headers.set(`x-webhook-filter-${key}`, value);
+    }
 }
