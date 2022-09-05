@@ -1,4 +1,4 @@
-import { TTL } from "../deps.ts";
+import { log, TTL } from "../deps.ts";
 import { UrlConfig } from "./types.d.ts";
 
 const reviewComments = new TTL<number>(2 * 1000);
@@ -44,6 +44,8 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
         const reviewId: number = json.comment?.pull_request_review_id;
         if (config.commentBurstLimit && reviewId) {
             const cacheKey = `${reviewId}-${login}`;
+            log.debug(`filter: checking cache key ${cacheKey}`);
+            log.debug(`filter: full comment cache ${JSON.stringify(Array.from(reviewComments))}`);
             const curr = reviewComments.get(cacheKey);
             if (curr && curr >= config.commentBurstLimit) {
                 return `exceeded comment burst limit (${config.commentBurstLimit}) for review ${reviewId}`;
