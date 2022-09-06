@@ -21,26 +21,26 @@ async function setupLogs(): Promise<void> {
 
 async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Response> {
     const reqLog = requestLog(req.headers);
-    let resp: Response;
+    let res: Response;
     try {
-        resp = await handler(req);
+        res = await handler(req);
     } catch (err) {
         if (http.isHttpError(err) && err.expose) {
             reqLog.warning(`http error: ${err.message}`);
-            resp = new Response(err.message, { status: err.status });
+            res = new Response(err.message, { status: err.status });
         } else {
             reqLog.critical(err);
-            resp = new Response("Internal Server Error", { status: 500 });
+            res = new Response("Internal Server Error", { status: 500 });
         }
     }
 
-    const respLen = resp.headers.get("content-length") || 0;
+    const respLen = res.headers.get("content-length") || 0;
     const addr = connInfo.remoteAddr as Deno.NetAddr;
     reqLog.info(
-        `http: ${addr.hostname}:${addr.port} - ${req.method} ${req.url} ${resp.status} ${respLen}`,
+        `http: ${addr.hostname}:${addr.port} - ${req.method} ${req.url} ${res.status} ${respLen}`,
     );
 
-    return resp;
+    return res;
 }
 
 if (import.meta.main) {
