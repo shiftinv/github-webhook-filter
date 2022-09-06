@@ -6,7 +6,7 @@ export async function sendWebhook(
     token: string,
     headers: Headers,
     body: string,
-): Promise<Response> {
+): Promise<[Response, Record<string, string>]> {
     const reqLog = requestLog(headers);
     const url = `https://discord.com/api/webhooks/${id}/${token}/github?wait=1`;
 
@@ -54,22 +54,9 @@ export async function sendWebhook(
         await sleep(resetms);
     } while (true);
 
-    // clone response to make headers mutable
-    res = new Response(res.body, res);
-
-    // set metadata headers
-    const meta: Record<string, string> = {
-        "deploy": config.deployId,
-    };
+    // set metadata
+    const meta: Record<string, string> = {};
     if (retries) meta["retries"] = retries.toString();
 
-    setMetadata(res, meta);
-
-    return res;
-}
-
-function setMetadata(res: Response, meta: Record<string, string>): void {
-    for (const [key, value] of Object.entries(meta)) {
-        res.headers.set(`x-webhook-filter-${key}`, value);
-    }
+    return [res, meta];
 }

@@ -6,7 +6,9 @@ import { UrlConfig } from "./types.d.ts";
 import { parseBool, requestLog } from "./util.ts";
 import { sendWebhook } from "./webhook.ts";
 
-export default async function handle(req: Request): Promise<Response> {
+export default async function handle(
+    req: Request,
+): Promise<Response | [Response, Record<string, string>]> {
     const url = new URL(req.url);
 
     // redirect to repo if `GET /`

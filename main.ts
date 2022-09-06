@@ -21,9 +21,16 @@ async function setupLogs(): Promise<void> {
 
 async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Response> {
     const reqLog = requestLog(req.headers);
+
     let res: Response;
+    let meta: Record<string, string> | null = null;
     try {
-        res = await handler(req);
+        const webhookResult = await handler(req);
+        if (webhookResult instanceof Response) {
+            res = webhookResult;
+        } else {
+            [res, meta] = webhookResult;
+        }
     } catch (err) {
         if (http.isHttpError(err) && err.expose) {
             reqLog.warning(`http error: ${err.message}`);
@@ -34,6 +41,19 @@ async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Res
         }
     }
 
+    // clone response to make headers mutable
+    res = new Response(res.body, res);
+
+    // set metadata headers
+    meta = {
+        "deploy": config.deployId,
+        ...meta,
+    };
+    for (const [key, value] of Object.entries(meta)) {
+        res.headers.set(`x-webhook-filter-${key}`, value);
+    }
+
+    // log request
     const respLen = res.headers.get("content-length") || 0;
     const addr = connInfo.remoteAddr as Deno.NetAddr;
     reqLog.info(
