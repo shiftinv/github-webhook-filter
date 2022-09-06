@@ -1,13 +1,13 @@
-import { log } from "../deps.ts";
 import config from "./config.ts";
-import { sleep } from "./util.ts";
+import { requestLog, sleep } from "./util.ts";
 
 export async function sendWebhook(
     id: string,
     token: string,
-    headers: HeadersInit,
+    headers: Headers,
     body: string,
 ): Promise<Response> {
+    const reqLog = requestLog(headers);
     const url = `https://discord.com/api/webhooks/${id}/${token}/github?wait=1`;
 
     let res: Response;
@@ -19,7 +19,7 @@ export async function sendWebhook(
             body: body,
         });
 
-        log.info(`sending webhook request to ${url}`);
+        reqLog.info(`sending webhook request to ${url}`);
         res = await fetch(req);
 
         // return response if everything's fine
@@ -38,7 +38,7 @@ export async function sendWebhook(
 
         // if we'd wait longer than the configured limit, just return the 429
         if (resetms > config.maxWebhookRetryMs) {
-            log.warning(
+            reqLog.warning(
                 `ratelimited for ${resetms}ms (> ${config.maxWebhookRetryMs}ms), not retrying`,
             );
             break;
@@ -46,11 +46,11 @@ export async function sendWebhook(
 
         // maybe wait and retry
         if (retries >= config.maxWebhookRetries) {
-            log.warning(`reached maximum number of retries (${retries})`);
+            reqLog.warning(`reached maximum number of retries (${retries})`);
             break;
         }
         retries++;
-        log.warning(`retrying after ${resetms}ms (retry ${retries})`);
+        reqLog.warning(`retrying after ${resetms}ms (retry ${retries})`);
         await sleep(resetms);
     } while (true);
 

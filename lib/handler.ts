@@ -1,9 +1,9 @@
-import { http, log } from "../deps.ts";
+import { http } from "../deps.ts";
 import config from "./config.ts";
 import { hasKey, verify } from "./crypto.ts";
 import filterWebhook from "./filter.ts";
 import { UrlConfig } from "./types.d.ts";
-import { parseBool } from "./util.ts";
+import { parseBool, requestLog } from "./util.ts";
 import { sendWebhook } from "./webhook.ts";
 
 export default async function handle(req: Request): Promise<Response> {
@@ -40,7 +40,8 @@ export default async function handle(req: Request): Promise<Response> {
     // do the thing
     const filterReason = filterWebhook(req.headers, json, urlConfig);
     if (filterReason !== null) {
-        log.debug(`handler: ignored due to '${filterReason}'`);
+        const reqLog = requestLog(req.headers);
+        reqLog.debug(`handler: ignored due to '${filterReason}'`);
         return new Response(`Ignored by webhook filter (reason: ${filterReason})`, { status: 203 });
     }
 

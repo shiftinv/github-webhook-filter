@@ -1,6 +1,7 @@
 import { http, log } from "./deps.ts";
 import config from "./lib/config.ts";
 import handler from "./lib/handler.ts";
+import { requestLog } from "./lib/util.ts";
 
 async function setupLogs(): Promise<void> {
     await log.setup({
@@ -19,22 +20,23 @@ async function setupLogs(): Promise<void> {
 }
 
 async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Response> {
+    const reqLog = requestLog(req.headers);
     let resp: Response;
     try {
         resp = await handler(req);
     } catch (err) {
         if (http.isHttpError(err) && err.expose) {
-            log.warning(`http error: ${err.message}`);
+            reqLog.warning(`http error: ${err.message}`);
             resp = new Response(err.message, { status: err.status });
         } else {
-            log.critical(err);
+            reqLog.critical(err);
             resp = new Response("Internal Server Error", { status: 500 });
         }
     }
 
     const respLen = resp.headers.get("content-length") || 0;
     const addr = connInfo.remoteAddr as Deno.NetAddr;
-    log.info(
+    reqLog.info(
         `http: ${addr.hostname}:${addr.port} - ${req.method} ${req.url} ${resp.status} ${respLen}`,
     );
 
