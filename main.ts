@@ -42,7 +42,7 @@ async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Res
 }
 
 if (import.meta.main) {
-    setupLogs();
+    await setupLogs();
 
     if (!config.signKey) {
         log.warning("url signing disabled");
