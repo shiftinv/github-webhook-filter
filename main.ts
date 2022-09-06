@@ -52,5 +52,6 @@ if (import.meta.main) {
     http.serve(handleRequest, {
         hostname: config.hostname,
         port: config.port,
+        onListen: () => log.info(`listening on ${config.hostname}:${config.port}`),
     });
 }
