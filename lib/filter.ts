@@ -1,10 +1,12 @@
-import { TTL } from "../deps.ts";
+import { reviewCommentManager } from "./manager.ts";
 import { UrlConfig } from "./types.d.ts";
 import { requestLog } from "./util.ts";
 
-const reviewComments = new TTL<number>(2 * 1000);
-
-export default function filter(headers: Headers, json: any, config: UrlConfig): string | null {
+export default async function filter(
+    headers: Headers,
+    json: any,
+    config: UrlConfig,
+): Promise<string | null> {
     const reqLog = requestLog(headers);
     const event = headers.get("x-github-event") || "unknown";
     const login: string | undefined = json.sender?.login?.toLowerCase();
@@ -47,14 +49,11 @@ export default function filter(headers: Headers, json: any, config: UrlConfig): 
         if (config.commentBurstLimit && reviewId) {
             const cacheKey = `${reviewId}-${login}`;
             reqLog.debug(`filter: checking cache key ${cacheKey}`);
-            reqLog.debug(
-                `filter: full comment cache ${JSON.stringify(Array.from(reviewComments))}`,
-            );
-            const curr = reviewComments.get(cacheKey);
+            const curr = await reviewCommentManager.getAndIncrement(cacheKey);
+            reqLog.debug(`filter: current value: ${curr}`);
             if (curr && curr >= config.commentBurstLimit) {
                 return `exceeded comment burst limit (${config.commentBurstLimit}) for review ${reviewId}`;
             }
-            reviewComments.set(cacheKey, (curr ?? 0) + 1);
         }
     }
 

@@ -40,7 +40,7 @@ export default async function handle(
     const json = JSON.parse(data);
 
     // do the thing
-    const filterReason = filterWebhook(req.headers, json, urlConfig);
+    const filterReason = await filterWebhook(req.headers, json, urlConfig);
     if (filterReason !== null) {
         const reqLog = requestLog(req.headers);
         reqLog.debug(`handler: ignored due to '${filterReason}'`);
