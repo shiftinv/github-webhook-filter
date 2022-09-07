@@ -1,4 +1,4 @@
-import { reviewCommentManager } from "./manager.ts";
+import { commentManager } from "./manager.ts";
 import { UrlConfig } from "./types.d.ts";
 import { requestLog } from "./util.ts";
 
@@ -36,21 +36,25 @@ export default async function filter(
     if (event === "pull_request_review") {
         // ignore edit/dismiss actions
         if (json.action !== "submitted") return `no-op PR review action '${json.action}'`;
+
         // if comment (not approval or changes requested), ignore empty review body
-        else if (json.review?.state === "commented" && !json.review?.body) return "empty PR review";
+        if (json.review?.state === "commented" && !json.review?.body) return "empty PR review";
     }
 
     // ignore some PR comment events
     if (event === "pull_request_review_comment") {
         // ignore edit/delete actions
         if (json.action !== "created") return `no-op PR comment action '${json.action}'`;
+
         // check if more than x comments on a PR review in a short timespan
         const reviewId: number = json.comment?.pull_request_review_id;
         if (config.commentBurstLimit && reviewId) {
             const cacheKey = `${reviewId}-${login}`;
+
             reqLog.debug(`filter: checking cache key ${cacheKey}`);
-            const curr = await reviewCommentManager.getAndIncrement(cacheKey);
+            const curr = await commentManager.getAndIncrement(cacheKey);
             reqLog.debug(`filter: current value: ${curr}`);
+
             if (curr && curr >= config.commentBurstLimit) {
                 return `exceeded comment burst limit (${config.commentBurstLimit}) for review ${reviewId}`;
             }

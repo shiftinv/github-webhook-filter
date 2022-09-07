@@ -17,7 +17,7 @@ export default {
     maxWebhookRetries: parseInt(get("MAX_RETRIES", "3")),
     maxWebhookRetryMs: parseInt(get("MAX_RETRY_MS", "30000")),
     mainRedirect: get("MAIN_REDIRECT", null),
-    redisUrl: get("REDIS_URL"),
+    redisUrl: get("REDIS_URL", null),
 
     // set by deno deploy
     deployId: get("DENO_DEPLOYMENT_ID", "<unknown>"),
