@@ -1,4 +1,4 @@
-import { redis, TTLCache } from "../deps.ts";
+import { log, redis, TTLCache } from "../deps.ts";
 import config from "./config.ts";
 
 const KEY_EXPIRY = 3; // seconds
@@ -22,9 +22,9 @@ class LocalCommentManager implements CommentManager {
 
 class RedisCommentManager implements CommentManager {
     private redis: redis.Redis;
-    constructor(redisUrl: string) {
+    constructor(redisOptions: redis.RedisConnectOptions) {
         this.redis = redis.createLazyClient({
-            ...redis.parseURL(redisUrl),
+            ...redisOptions,
             maxRetryCount: 3,
         });
     }
@@ -47,6 +47,22 @@ class RedisCommentManager implements CommentManager {
     }
 }
 
-export const commentManager = config.redisUrl
-    ? new RedisCommentManager(config.redisUrl)
-    : new LocalCommentManager();
+let commentManager: CommentManager;
+if (config.redisUrl) {
+    const opts = redis.parseURL(config.redisUrl);
+
+    // validate perms now to avoid unnecessarily retrying later on
+    const host = opts.hostname + (opts.port ? `:${opts.port}` : "");
+    const permStatus = await Deno.permissions.request({ name: "net", host: host });
+    if (permStatus.state !== "granted") {
+        throw new Error("Network access to redis url is required");
+    }
+
+    log.debug("using RedisCommentManager");
+    commentManager = new RedisCommentManager(opts);
+} else {
+    log.debug("using LocalCommentManager, no redis url configured");
+    commentManager = new LocalCommentManager();
+}
+
+export { commentManager };
