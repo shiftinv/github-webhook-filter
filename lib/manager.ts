@@ -1,4 +1,4 @@
-import { log, redis, TTLCache } from "../deps.ts";
+import { Lock, log, redis, TTLCache } from "../deps.ts";
 import config from "./config.ts";
 
 const KEY_EXPIRY = 3; // seconds
@@ -22,10 +22,12 @@ class LocalCommentManager implements CommentManager {
 
 class RedisCommentManager implements CommentManager {
     private connectOptions: redis.RedisConnectOptions;
+    private lock: Lock;
     private _redis: Promise<redis.Redis> | undefined;
 
     constructor(options: redis.RedisConnectOptions) {
         this.connectOptions = options;
+        this.lock = new Lock();
     }
 
     // manual lazy init, redis.createLazyClient currently doesn't support pipelines :/
@@ -40,16 +42,21 @@ class RedisCommentManager implements CommentManager {
     }
 
     async getAndIncrement(key: string): Promise<number> {
-        const redis = await this.redis();
-        key = `reviewcomment:${key}`;
+        await this.lock.acquire();
+        try {
+            const redis = await this.redis();
+            key = `reviewcomment:${key}`;
 
-        const pl = redis.pipeline();
-        pl.incr(key);
-        pl.expire(key, KEY_EXPIRY);
-        const results = await pl.flush();
+            const pl = redis.pipeline();
+            pl.incr(key);
+            pl.expire(key, KEY_EXPIRY);
+            const results = await pl.flush();
 
-        const newValue = results[0] as number;
-        return newValue - 1; // return old value
+            const newValue = results[0] as number;
+            return newValue - 1; // return old value
+        } finally {
+            this.lock.release();
+        }
     }
 }
 
