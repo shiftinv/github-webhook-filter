@@ -21,23 +21,29 @@ class LocalCommentManager implements CommentManager {
 }
 
 class RedisCommentManager implements CommentManager {
-    private redis: redis.Redis;
-    constructor(redisOptions: redis.RedisConnectOptions) {
-        this.redis = redis.createLazyClient({
-            ...redisOptions,
-            maxRetryCount: 3,
-        });
+    private connectOptions: redis.RedisConnectOptions;
+    private _redis: Promise<redis.Redis> | undefined;
+
+    constructor(options: redis.RedisConnectOptions) {
+        this.connectOptions = options;
+    }
+
+    // manual lazy init, redis.createLazyClient currently doesn't support pipelines :/
+    private redis(): Promise<redis.Redis> {
+        if (!this._redis) {
+            this._redis = redis.connect({
+                ...this.connectOptions,
+                maxRetryCount: 3,
+            });
+        }
+        return this._redis;
     }
 
     async getAndIncrement(key: string): Promise<number> {
+        const redis = await this.redis();
         key = `reviewcomment:${key}`;
 
-        // seems like pipelines don't quite work with the lazy client, so force a connection
-        if (!this.redis.isConnected) {
-            await this.redis.ping();
-        }
-
-        const pl = this.redis.pipeline();
+        const pl = redis.pipeline();
         pl.incr(key);
         pl.expire(key, KEY_EXPIRY);
         const results = await pl.flush();
