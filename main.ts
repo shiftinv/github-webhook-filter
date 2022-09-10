@@ -53,6 +53,11 @@ async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Res
         res.headers.set(`x-webhook-filter-${key}`, value);
     }
 
+    // remove other headers that don't make sense here
+    for (const header of ["set-cookie", "alt-svc"]) {
+        res.headers.delete(header);
+    }
+
     // log request
     const respLen = res.headers.get("content-length") || 0;
     const addr = connInfo.remoteAddr as Deno.NetAddr;
