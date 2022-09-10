@@ -9,16 +9,13 @@ Certain no-op events (which Discord would ignore anyway) and common CI bots are 
 
 ## Usage
 
-> **Note**
-> The main service (`https://github-webhook-filter.deno.dev/`) is not open to the public (yet?), and currently requires an api key to prevent abuse. Feel free to message me on Discord if you want to use it.
-> Alternatively, you can always host the project yourself, and customize it to your liking c:
-
+0. Host the project somewhere, for example https://deno.com/deploy. Remember to add the environment variables you may want to set, see [`lib/config.ts`](./lib/config.ts).
 1. Create a Discord webhook (`https://discord.com/api/webhooks/1234/ABCDWXYZ`).
-2. Take the ID (`1234`) and token (`ABCDWXYZ`) from the URL, and enter `https://<filter_url>/1234/ABCDWXYZ` (note: no `/github`) in the GitHub webhook settings:  
+1. Take the ID (`1234`) and token (`ABCDWXYZ`) from the URL, and enter `https://<filter_url>/1234/ABCDWXYZ` (note: no `/github`) in the GitHub webhook settings:  
     ![settings](./.github/assets/github-settings.png)
-3. Optionally add configuration parameters (see below) to the URL, e.g. `?allowBranches=master,dev&hideTags=1`.
-4. ????
-5. Profit!
+1. Optionally add configuration parameters (see below) to the URL, e.g. `?allowBranches=master,dev&hideTags=1`.
+1. ????
+1. Profit!
 
 
 ## Configuration
