@@ -86,8 +86,8 @@ export default async function filter(
         }
     }
 
-    // ignore creation of branch/tag
-    if (event === "create") {
+    // ignore creation/deletion of branch/tag
+    if (["create", "delete"].includes(event)) {
         // check if branch is allowed
         if (
             json.ref_type === "branch" && config.allowBranches !== undefined &&
