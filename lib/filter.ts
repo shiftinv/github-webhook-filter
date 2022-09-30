@@ -69,7 +69,7 @@ export default async function filter(
         return "bot";
     }
 
-    // ignore branch/tag if configured
+    // ignore branch/tag push
     const refMatch = /^refs\/([^\/]+)\/(.+)$/.exec(json.ref);
     if (event === "push" && refMatch) {
         // check if branch is allowed
@@ -83,6 +83,22 @@ export default async function filter(
         // check if it's a tag
         if (refMatch[1] == "tags" && config.hideTags === true) {
             return `tag '${refMatch[2]}'`;
+        }
+    }
+
+    // ignore creation of branch/tag
+    if (event === "create") {
+        // check if branch is allowed
+        if (
+            json.ref_type === "branch" && config.allowBranches !== undefined &&
+            !config.allowBranches.includes(json.ref)
+        ) {
+            return `branch '${json.ref}' not in ${JSON.stringify(config.allowBranches)}`;
+        }
+
+        // check if it's a tag
+        if (json.ref_type == "tag" && config.hideTags === true) {
+            return `tag '${json.ref}'`;
         }
     }
 
