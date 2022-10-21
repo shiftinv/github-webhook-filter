@@ -8,7 +8,29 @@ export function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function getLogString(data: unknown): string {
+function _escapeRegex(pattern: string): string {
+    return pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+export function wildcardMatch(pattern: string, target: string): boolean {
+    let invert = false;
+    if (pattern[0] === "!") {
+        invert = true;
+        pattern = pattern.slice(1);
+    }
+
+    // allow `*` wildcard specifier, translate to `.*` regex;
+    // escape everything else
+    pattern = pattern.split("*").map(_escapeRegex).join(".*");
+    // treat `,` as `|`
+    pattern = pattern.replace(",", "|");
+    // add anchors
+    pattern = `^(${pattern})$`;
+
+    return invert !== new RegExp(pattern).test(target);
+}
+
+function _getLogString(data: unknown): string {
     return log.getLogger().asString(data);
 }
 
@@ -23,7 +45,7 @@ export function requestLog(headers: Headers) {
     // is there a better way to do this? certainly.
     // does this work? also yes.
     const proxyLog: (func: (s: any) => string) => (msg: any) => string = (func) => {
-        return (msg) => func(prefix + getLogString(msg));
+        return (msg) => func(prefix + _getLogString(msg));
     };
 
     return {

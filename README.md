@@ -22,6 +22,9 @@ Certain no-op events (which Discord would ignore anyway) and common CI bots are 
 
 Additional options can be configured per URL:
 
-- Only forward events from specific branches (`allowBranches`, comma-separated list)
+- Only forward events from specific branches (`allowBranches`, simplified wildcard syntax)
+    - `abc*xyz` is equivalent to `/^(abc.*xyz)$/`
+    - `stuff,things` is equivalent to `/^(stuff|things)$/`
+    - `!oh*hi*there` is equivalent to `/^(oh.*hi.*there)$/` inverted
 - Ignore tag updates (`hideTags`)
 - Ignore burst PR review comments in a short timespan, only showing the first x comments (`commentBurstLimit`)

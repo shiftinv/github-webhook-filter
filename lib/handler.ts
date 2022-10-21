@@ -57,7 +57,7 @@ function getUrlConfig(params: URLSearchParams): UrlConfig {
             case "sig":
                 continue;
             case "allowBranches":
-                config.allowBranches = value.split(",");
+                config.allowBranches = value;
                 break;
             case "hideTags":
                 config.hideTags = parseBool(value);

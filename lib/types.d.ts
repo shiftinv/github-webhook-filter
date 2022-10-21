@@ -1,5 +1,5 @@
 export interface UrlConfig {
-    allowBranches?: string[];
+    allowBranches?: string;
     hideTags?: boolean;
     commentBurstLimit?: number;
 }

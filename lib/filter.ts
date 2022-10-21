@@ -1,6 +1,6 @@
 import { commentManager } from "./manager.ts";
 import { UrlConfig } from "./types.d.ts";
-import { requestLog } from "./util.ts";
+import { requestLog, wildcardMatch } from "./util.ts";
 
 export default async function filter(
     headers: Headers,
@@ -89,9 +89,9 @@ export default async function filter(
     if (refType && ref) {
         if (
             refType == "branch" && config.allowBranches !== undefined &&
-            !config.allowBranches.includes(ref)
+            !wildcardMatch(config.allowBranches, ref)
         ) {
-            return `branch '${ref}' not in ${JSON.stringify(config.allowBranches)}`;
+            return `branch '${ref}' does not match ${JSON.stringify(config.allowBranches)}`;
         }
         if (refType == "tag" && config.hideTags === true) {
             return `tag '${ref}'`;
