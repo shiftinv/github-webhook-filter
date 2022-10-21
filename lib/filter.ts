@@ -69,36 +69,32 @@ export default async function filter(
         return "bot";
     }
 
-    // ignore branch/tag push
-    const refMatch = /^refs\/([^\/]+)\/(.+)$/.exec(json.ref);
-    if (event === "push" && refMatch) {
-        // check if branch is allowed
-        if (
-            refMatch[1] == "heads" && config.allowBranches !== undefined &&
-            !config.allowBranches.includes(refMatch[2])
-        ) {
-            return `branch '${refMatch[2]}' not in ${JSON.stringify(config.allowBranches)}`;
+    let refType: "branch" | "tag" | undefined;
+    let ref: string | undefined;
+    if (event === "push") {
+        // ignore branch/tag push
+        const refMatch = /^refs\/([^\/]+)\/(.+)$/.exec(json.ref);
+        if (refMatch) {
+            refType = refMatch[1] === "heads"
+                ? "branch"
+                : (refMatch[1] == "tags" ? "tag" : undefined);
+            ref = refMatch[2];
         }
-
-        // check if it's a tag
-        if (refMatch[1] == "tags" && config.hideTags === true) {
-            return `tag '${refMatch[2]}'`;
-        }
+    } else if (["create", "delete"].includes(event)) {
+        // ignore creation/deletion of branch/tag
+        refType = json.ref_type;
+        ref = json.ref;
     }
 
-    // ignore creation/deletion of branch/tag
-    if (["create", "delete"].includes(event)) {
-        // check if branch is allowed
+    if (refType && ref) {
         if (
-            json.ref_type === "branch" && config.allowBranches !== undefined &&
-            !config.allowBranches.includes(json.ref)
+            refType == "branch" && config.allowBranches !== undefined &&
+            !config.allowBranches.includes(ref)
         ) {
-            return `branch '${json.ref}' not in ${JSON.stringify(config.allowBranches)}`;
+            return `branch '${ref}' not in ${JSON.stringify(config.allowBranches)}`;
         }
-
-        // check if it's a tag
-        if (json.ref_type == "tag" && config.hideTags === true) {
-            return `tag '${json.ref}'`;
+        if (refType == "tag" && config.hideTags === true) {
+            return `tag '${ref}'`;
         }
     }
 
