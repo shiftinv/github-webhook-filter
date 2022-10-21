@@ -23,7 +23,7 @@ export function wildcardMatch(pattern: string, target: string): boolean {
     // escape everything else
     pattern = pattern.split("*").map(_escapeRegex).join(".*");
     // treat `,` as `|`
-    pattern = pattern.replace(",", "|");
+    pattern = pattern.replaceAll(",", "|");
     // add anchors
     pattern = `^(${pattern})$`;
 
