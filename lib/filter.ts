@@ -86,6 +86,13 @@ export default async function filter(
         ref = json.ref;
     }
 
+    // if we have a `push` event for a tag, it will either not show up at all (create/delete),
+    // or will show up incorrectly (update).
+    // just ignore it, since tag creation/deletion also sends a separate (actually usable) event
+    if (event === "push" && refType === "tag") {
+        return `tag '${ref}' pushed`;
+    }
+
     if (refType && ref) {
         if (
             refType == "branch" && config.allowBranches !== undefined &&
