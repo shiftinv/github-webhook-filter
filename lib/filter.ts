@@ -64,7 +64,9 @@ export default async function filter(
     // ignore bots
     if (
         login &&
-        ["coveralls[bot]", "netlify[bot]", "pre-commit-ci[bot]"].some((n) => login.includes(n))
+        ["coveralls[bot]", "netlify[bot]", "pre-commit-ci[bot]", "dependabot[bot]"].some((n) =>
+            login.includes(n)
+        )
     ) {
         return "bot";
     }
