@@ -61,16 +61,6 @@ export default async function filter(
         }
     }
 
-    // ignore bots
-    if (
-        login &&
-        ["coveralls[bot]", "netlify[bot]", "pre-commit-ci[bot]", "dependabot[bot]"].some((n) =>
-            login.includes(n)
-        )
-    ) {
-        return "bot";
-    }
-
     let refType: "branch" | "tag" | undefined;
     let ref: string | undefined;
     if (event === "push") {
@@ -95,16 +85,30 @@ export default async function filter(
         return `tag '${ref}' pushed`;
     }
 
+    // true if `allowBranches` is set and the current branch matches it
+    let isExplicitlyAllowedBranch = false;
+
     if (refType && ref) {
-        if (
-            refType == "branch" && config.allowBranches !== undefined &&
-            !wildcardMatch(config.allowBranches, ref)
-        ) {
-            return `branch '${ref}' does not match ${JSON.stringify(config.allowBranches)}`;
+        if (refType == "branch" && config.allowBranches !== undefined) {
+            isExplicitlyAllowedBranch = wildcardMatch(config.allowBranches, ref);
+            if (!isExplicitlyAllowedBranch) {
+                return `branch '${ref}' does not match ${JSON.stringify(config.allowBranches)}`;
+            }
         }
         if (refType == "tag" && config.hideTags === true) {
             return `tag '${ref}'`;
         }
+    }
+
+    // ignore bots
+    if (
+        !isExplicitlyAllowedBranch && // show bot pushes on allowed branches
+        login &&
+        ["coveralls[bot]", "netlify[bot]", "pre-commit-ci[bot]", "dependabot[bot]"].some((n) =>
+            login.includes(n)
+        )
+    ) {
+        return "bot";
     }
 
     return null;
