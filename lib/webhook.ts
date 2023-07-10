@@ -5,10 +5,11 @@ export async function sendWebhook(
     id: string,
     token: string,
     headers: Headers,
-    body: string,
+    data: Record<string, any>,
 ): Promise<[Response, Record<string, string>]> {
     const reqLog = requestLog(headers);
     const url = `https://discord.com/api/webhooks/${id}/${token}/github?wait=1`;
+    const body = JSON.stringify(data);
 
     let res: Response;
     let retries = 0;

@@ -2,6 +2,7 @@ import { http } from "../deps.ts";
 import config from "./config.ts";
 import { hasKey, verify } from "./crypto.ts";
 import filterWebhook from "./filter.ts";
+import fixupEmbeds from "./formatter.ts";
 import { UrlConfig } from "./types.d.ts";
 import { parseBool, requestLog } from "./util.ts";
 import { sendWebhook } from "./webhook.ts";
@@ -37,7 +38,7 @@ export default async function handle(
     // extract data
     const urlConfig = getUrlConfig(url.searchParams);
     const data = await req.text();
-    const json = JSON.parse(data);
+    const json: Record<string, any> = JSON.parse(data);
 
     // do the thing
     const filterReason = await filterWebhook(req.headers, json, urlConfig);
@@ -47,7 +48,10 @@ export default async function handle(
         return new Response(`Ignored by webhook filter (reason: ${filterReason})`, { status: 203 });
     }
 
-    return await sendWebhook(id, token, req.headers, data);
+    // mutate `json` in-place (fixing codeblocks etc.)
+    fixupEmbeds(json);
+
+    return await sendWebhook(id, token, req.headers, json);
 }
 
 function getUrlConfig(params: URLSearchParams): UrlConfig {
