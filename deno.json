@@ -1,14 +1,10 @@
 {
     "fmt": {
-        "options": {
-            "indentWidth": 4,
-            "lineWidth": 100
-        },
-        "files": {
-            "exclude": [
-                ".vscode"
-            ]
-        }
+        "indentWidth": 4,
+        "lineWidth": 100,
+        "exclude": [
+            ".vscode"
+        ]
     },
     "lint": {
         "rules": {
