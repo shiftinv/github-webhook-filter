@@ -6,7 +6,9 @@ function maybeTransformText(s: string): string {
     // If length exceeds limit, add backticks since they might otherwise be removed
     const suffix = "…\n```";
     const maxLen = EMBED_LIMIT - suffix.length;
-    if (s.includes("```") && s.length > maxLen) {
+    // n.b. this heuristic is by no means perfect; it might add backticks when not necessary,
+    // but I really don't want to implement a markdown parser here c:
+    if (s.length > maxLen && s.substring(maxLen).includes("```")) {
         s = s.substring(0, maxLen) + suffix;
     }
     return s;
