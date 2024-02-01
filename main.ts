@@ -1,4 +1,4 @@
-import { http, httpErrors, log } from "./deps.ts";
+import { httpErrors, log } from "./deps.ts";
 import config from "./lib/config.ts";
 import handler from "./lib/handler.ts";
 import { requestLog } from "./lib/util.ts";
@@ -19,7 +19,7 @@ function setupLogs() {
     });
 }
 
-async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Response> {
+async function handleRequest(req: Request, info: Deno.ServeHandlerInfo): Promise<Response> {
     const reqLog = requestLog(req.headers);
 
     let res: Response;
@@ -33,7 +33,7 @@ async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Res
         }
     } catch (err) {
         if (err instanceof httpErrors.HttpError && err.expose) {
-            reqLog.warning(`http error: ${err.message}`);
+            reqLog.warn(`http error: ${err.message}`);
             res = new Response(err.message, { status: err.status });
         } else {
             reqLog.critical(err);
@@ -60,7 +60,7 @@ async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Res
 
     // log request
     const respLen = res.headers.get("content-length") || 0;
-    const addr = connInfo.remoteAddr as Deno.NetAddr;
+    const addr = info.remoteAddr;
     reqLog.info(
         `http: ${addr.hostname}:${addr.port} - ${req.method} ${req.url} ${res.status} ${respLen}`,
     );
@@ -72,13 +72,13 @@ if (import.meta.main) {
     setupLogs();
 
     if (!config.signKey) {
-        log.warning("url signing disabled");
+        log.warn("url signing disabled");
     }
 
     log.info(`starting webserver on ${config.hostname}:${config.port}`);
-    http.serve(handleRequest, {
+    Deno.serve({
         hostname: config.hostname,
         port: config.port,
         onListen: () => log.info(`listening on ${config.hostname}:${config.port}`),
-    });
+    }, handleRequest);
 }

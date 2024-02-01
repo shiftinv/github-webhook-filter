@@ -51,7 +51,7 @@ export function requestLog(headers: Headers) {
     return {
         debug: proxyLog(log.debug),
         info: proxyLog(log.info),
-        warning: proxyLog(log.warning),
+        warn: proxyLog(log.warn),
         error: proxyLog(log.error),
         critical: proxyLog(log.critical),
     };
