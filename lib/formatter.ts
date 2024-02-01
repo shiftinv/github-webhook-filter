@@ -1,9 +1,11 @@
+import { githubEmoji } from "../deps.ts";
+
 // Empirically determined GitHub embed description limit in the Discord API.
 // Anything above this will be ellipsized :/
 const EMBED_LIMIT = 500;
 
-function maybeTransformText(s: string): string {
-    // If length exceeds limit, add backticks since they might otherwise be removed
+// If length exceeds limit, add backticks since they might otherwise be removed
+function ellipsizeText(s: string): string {
     const suffix = "…\n```";
     const maxLen = EMBED_LIMIT - suffix.length;
     // n.b. this heuristic is by no means perfect; it might add backticks when not necessary,
@@ -13,6 +15,15 @@ function maybeTransformText(s: string): string {
     }
     return s;
 }
+
+function transformEmojis(s: string): string {
+    return githubEmoji.emojify(s);
+}
+
+const TRANSFORMS: ((s: string) => string)[] = [
+    transformEmojis,
+    ellipsizeText,
+];
 
 export default function fixupEmbeds(data: Record<string, any>): void {
     for (
@@ -31,6 +42,10 @@ export default function fixupEmbeds(data: Record<string, any>): void {
             "answer",
         ]
     ) {
-        if (data[field]?.body) data[field].body = maybeTransformText(data[field].body);
+        if (data[field]?.body) {
+            for (const transform of TRANSFORMS) {
+                data[field].body = transform(data[field].body);
+            }
+        }
     }
 }
