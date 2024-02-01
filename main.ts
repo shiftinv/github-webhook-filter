@@ -71,8 +71,8 @@ async function handleRequest(req: Request, info: Deno.ServeHandlerInfo): Promise
 if (import.meta.main) {
     setupLogs();
 
-    if (!config.signKey) {
-        log.warn("url signing disabled");
+    if (config.signKey) {
+        log.info("url signing enabled");
     }
 
     log.info(`starting webserver on ${config.hostname}:${config.port}`);
