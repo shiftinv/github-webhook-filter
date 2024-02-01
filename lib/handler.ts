@@ -1,4 +1,4 @@
-import { http } from "../deps.ts";
+import { httpErrors } from "../deps.ts";
 import config from "./config.ts";
 import { hasKey, verify } from "./crypto.ts";
 import filterWebhook from "./filter.ts";
@@ -19,20 +19,20 @@ export default async function handle(
 
     // everything else should be a POST
     if (req.method !== "POST") {
-        throw http.createHttpError(405);
+        throw httpErrors.createError(405);
     }
 
     // split url into parts
     const [, id, token] = url.pathname.split("/");
     if (!id || !token) {
-        throw http.createHttpError(400);
+        throw httpErrors.createError(400);
     }
 
     // verify signature
     if (hasKey) {
         const signature = url.searchParams.get("sig");
-        if (!signature) throw http.createHttpError(400);
-        if (!(await verify(`${id}/${token}`, signature))) throw http.createHttpError(403);
+        if (!signature) throw httpErrors.createError(400);
+        if (!(await verify(`${id}/${token}`, signature))) throw httpErrors.createError(403);
     }
 
     // extract data
@@ -70,7 +70,7 @@ function getUrlConfig(params: URLSearchParams): UrlConfig {
                 config.commentBurstLimit = parseInt(value);
                 break;
             default:
-                throw http.createHttpError(418, `Unknown config option: ${key}`);
+                throw httpErrors.createError(418, `Unknown config option: ${key}`);
         }
     }
     return config;

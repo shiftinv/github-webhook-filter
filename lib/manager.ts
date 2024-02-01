@@ -1,4 +1,4 @@
-import { Lock, log, redis, TTLCache } from "../deps.ts";
+import { log, Mutex, redis, TTLCache } from "../deps.ts";
 import config from "./config.ts";
 
 const KEY_EXPIRY = 3; // seconds
@@ -22,12 +22,12 @@ class LocalCommentManager implements CommentManager {
 
 class RedisCommentManager implements CommentManager {
     private connectOptions: redis.RedisConnectOptions;
-    private lock: Lock;
+    private lock: Mutex;
     private _redis: Promise<redis.Redis> | undefined;
 
     constructor(options: redis.RedisConnectOptions) {
         this.connectOptions = options;
-        this.lock = new Lock();
+        this.lock = new Mutex();
     }
 
     // manual lazy init, redis.createLazyClient currently doesn't support pipelines :/

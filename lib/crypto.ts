@@ -13,7 +13,7 @@ async function getKey(): Promise<CryptoKey> {
 
         _signKey = await crypto.subtle.importKey(
             "raw",
-            hex.decode(new TextEncoder().encode(config.signKey)),
+            hex.decodeHex(config.signKey),
             { name: "HMAC", hash: "SHA-256" },
             false,
             ["sign", "verify"],
@@ -26,12 +26,12 @@ export async function sign(input: string): Promise<string> {
     const key = await getKey();
     const inputData = encoder.encode(input);
     const sig = await crypto.subtle.sign("HMAC", key, inputData);
-    return new TextDecoder().decode(hex.encode(new Uint8Array(sig)));
+    return hex.encodeHex(sig);
 }
 
 export async function verify(input: string, signature: string): Promise<boolean> {
     const key = await getKey();
-    const signatureData = hex.decode(encoder.encode(signature));
     const inputData = encoder.encode(input);
-    return await crypto.subtle.verify("HMAC", key, signatureData, inputData);
+    const sig = hex.decodeHex(signature);
+    return await crypto.subtle.verify("HMAC", key, sig, inputData);
 }

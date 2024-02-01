@@ -1,12 +1,12 @@
-import { http, log } from "./deps.ts";
+import { http, httpErrors, log } from "./deps.ts";
 import config from "./lib/config.ts";
 import handler from "./lib/handler.ts";
 import { requestLog } from "./lib/util.ts";
 
-async function setupLogs(): Promise<void> {
-    await log.setup({
+function setupLogs() {
+    log.setup({
         handlers: {
-            console: new log.handlers.ConsoleHandler("DEBUG", {
+            console: new log.ConsoleHandler("DEBUG", {
                 formatter: (rec) => `${rec.datetime.toISOString()} [${rec.levelName}] ${rec.msg}`,
             }),
         },
@@ -32,7 +32,7 @@ async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Res
             [res, meta] = webhookResult;
         }
     } catch (err) {
-        if (http.isHttpError(err) && err.expose) {
+        if (err instanceof httpErrors.HttpError && err.expose) {
             reqLog.warning(`http error: ${err.message}`);
             res = new Response(err.message, { status: err.status });
         } else {
@@ -69,7 +69,7 @@ async function handleRequest(req: Request, connInfo: http.ConnInfo): Promise<Res
 }
 
 if (import.meta.main) {
-    await setupLogs();
+    setupLogs();
 
     if (!config.signKey) {
         log.warning("url signing disabled");
