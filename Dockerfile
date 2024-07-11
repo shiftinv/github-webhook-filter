@@ -1,7 +1,7 @@
-FROM denoland/deno:alpine-1.25.1
+FROM denoland/deno:alpine-1.45.0
 
-WORKDIR /app
 USER deno
+WORKDIR /app
 
 COPY deps.ts .
 RUN deno cache deps.ts
@@ -9,4 +9,4 @@ RUN deno cache deps.ts
 COPY . .
 RUN deno cache main.ts
 
-CMD ["run", "--allow-env", "--allow-net=:8080,discord.com", "main.ts"]
+CMD ["run", "--allow-env", "--allow-net=:8080,discord.com", "--unstable-kv", "main.ts"]
