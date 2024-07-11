@@ -1,9 +1,11 @@
+import type { RequestLog } from "./util.ts";
+
 const KEY_EXPIRY = 3; // seconds
 const MAX_RETRIES = 50;
 
 const kv = await Deno.openKv();
 
-export async function getAndIncrementKV(key: string): Promise<number> {
+export async function getAndIncrementKV(key: string, reqLog: RequestLog): Promise<number> {
     const kvKey = ["pr-comment", key];
 
     // keep retrying until atomic operation succeeds with same versionstamp
@@ -17,7 +19,10 @@ export async function getAndIncrementKV(key: string): Promise<number> {
             .check(res)
             .set(kvKey, value + 1, { expireIn: KEY_EXPIRY * 1000 })
             .commit();
-        if (setRes.ok) return value;
+        if (setRes.ok) {
+            reqLog.debug(`updated ${JSON.stringify(kvKey)} after ${i} retries`);
+            return value;
+        }
     }
 
     throw new Error(

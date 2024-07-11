@@ -52,7 +52,7 @@ export default async function filter(
             const cacheKey = `${reviewId}-${login}`;
 
             reqLog.debug(`filter: checking cache key ${cacheKey}`);
-            const curr = await getAndIncrementKV(cacheKey);
+            const curr = await getAndIncrementKV(cacheKey, reqLog);
             reqLog.debug(`filter: current value: ${curr}`);
 
             if (curr && curr >= config.commentBurstLimit) {

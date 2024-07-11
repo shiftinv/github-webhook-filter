@@ -56,3 +56,5 @@ export function requestLog(headers: Headers) {
         critical: proxyLog(log.critical),
     };
 }
+
+export type RequestLog = ReturnType<typeof requestLog>;
