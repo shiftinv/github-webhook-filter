@@ -14,8 +14,7 @@ see [configuration](#configuration) below for more.
    variables you may want to set, see [`lib/config.ts`](./lib/config.ts).
 1. Create a Discord webhook (`https://discord.com/api/webhooks/1234/ABCDWXYZ`).
 2. Take the ID (`1234`) and token (`ABCDWXYZ`) from the URL, and enter
-   `https://<filter_url>/1234/ABCDWXYZ` (note: no `/github`) in the GitHub webhook settings:
-   \
+   `https://<filter_url>/1234/ABCDWXYZ` (note: no `/github`) in the GitHub webhook settings:\
    ![settings](./.github/assets/github-settings.png)
 3. Optionally add configuration parameters (see below) to the URL, e.g.
    `?allowBranches=master,dev&hideTags=1`.
