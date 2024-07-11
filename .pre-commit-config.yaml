@@ -15,7 +15,7 @@ repos:
         name: deno-fmt
         entry: deno fmt -q
         language: system
-        types_or: [javascript, jsx, ts, tsx]
+        types_or: [javascript, jsx, ts, tsx, markdown]
       - id: deno-lint
         name: deno-lint
         entry: deno lint -q
