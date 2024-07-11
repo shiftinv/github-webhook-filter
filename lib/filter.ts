@@ -1,4 +1,4 @@
-import { commentManager } from "./manager.ts";
+import { getAndIncrementKV } from "./kv.ts";
 import { UrlConfig } from "./types.d.ts";
 import { requestLog, wildcardMatch } from "./util.ts";
 
@@ -52,7 +52,7 @@ export default async function filter(
             const cacheKey = `${reviewId}-${login}`;
 
             reqLog.debug(`filter: checking cache key ${cacheKey}`);
-            const curr = await commentManager.getAndIncrement(cacheKey);
+            const curr = await getAndIncrementKV(cacheKey);
             reqLog.debug(`filter: current value: ${curr}`);
 
             if (curr && curr >= config.commentBurstLimit) {

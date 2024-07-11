@@ -30,5 +30,5 @@ Additional options can be configured per URL:
   - `stuff,things` is equivalent to `/^(stuff|things)$/`
   - `!oh*hi*there` is equivalent to `/^(oh.*hi.*there)$/` inverted
 - Ignore tag updates (`hideTags`)
-- Ignore burst PR review comments in a short timespan, only showing the first x comments
+- Ignore burst PR review comments in a short timespan, only showing the first x comments per review
   (`commentBurstLimit`)
