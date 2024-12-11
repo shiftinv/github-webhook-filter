@@ -1,9 +1,11 @@
+import { Hono } from "@hono/hono";
+import { HTTPException } from "@hono/hono/http-exception";
+import { logger } from "@hono/hono/logger";
 import * as log from "@std/log";
-import * as httpErrors from "x/http_errors";
 
 import config from "./config.ts";
+import { hasKey, verify } from "./crypto.ts";
 import handler from "./handler.ts";
-import { requestLog } from "./util.ts";
 
 function setupLogs() {
     log.setup({
@@ -21,27 +23,29 @@ function setupLogs() {
     });
 }
 
-async function handleRequest(req: Request, info: Deno.ServeHandlerInfo): Promise<Response> {
-    const reqLog = requestLog(req.headers);
+const app = new Hono();
 
-    let res: Response;
-    let meta: Record<string, string> | null = null;
-    try {
-        const webhookResult = await handler(req);
-        if (webhookResult instanceof Response) {
-            res = webhookResult;
-        } else {
-            [res, meta] = webhookResult;
-        }
-    } catch (err) {
-        if (err instanceof httpErrors.HttpError && err.expose) {
-            reqLog.warn(`http error: ${err.message}`);
-            res = new Response(err.message, { status: err.status });
-        } else {
-            reqLog.critical(err);
-            res = new Response("Internal Server Error", { status: 500 });
+app.use(logger());
+
+if (config.mainRedirect) {
+    app.get("/", (c) => {
+        return c.redirect(config.mainRedirect!);
+    });
+}
+
+app.post("/:id/:token", async (c) => {
+    const { id, token } = c.req.param();
+
+    // verify signature
+    if (hasKey) {
+        const signature = c.req.query("sig");
+        if (!signature || !(await verify(`${id}/${token}`, signature))) {
+            throw new HTTPException(403);
         }
     }
+
+    const data = await c.req.json();
+    let [res, meta] = await handler(data, c.req.header(), c.req.query(), id, token);
 
     // clone response to make headers mutable
     res = new Response(res.body, res);
@@ -60,15 +64,8 @@ async function handleRequest(req: Request, info: Deno.ServeHandlerInfo): Promise
         res.headers.delete(header);
     }
 
-    // log request
-    const respLen = res.headers.get("content-length") || 0;
-    const addr = info.remoteAddr;
-    reqLog.info(
-        `http: ${addr.hostname}:${addr.port} - ${req.method} ${req.url} ${res.status} ${respLen}`,
-    );
-
     return res;
-}
+});
 
 if (import.meta.main) {
     setupLogs();
@@ -77,10 +74,12 @@ if (import.meta.main) {
         log.info("url signing enabled");
     }
 
-    log.info(`starting webserver on ${config.hostname}:${config.port}`);
-    Deno.serve({
-        hostname: config.hostname,
-        port: config.port,
-        onListen: () => log.info(`listening on ${config.hostname}:${config.port}`),
-    }, handleRequest);
+    Deno.serve(
+        {
+            hostname: config.hostname,
+            port: config.port,
+            onListen: () => log.info(`listening on ${config.hostname}:${config.port}`),
+        },
+        app.fetch,
+    );
 }

@@ -4,7 +4,7 @@ import { requestLog, sleep } from "./util.ts";
 export async function sendWebhook(
     id: string,
     token: string,
-    headers: Headers,
+    headers: Record<string, string>,
     data: Record<string, any>,
 ): Promise<[Response, Record<string, string>]> {
     const reqLog = requestLog(headers);

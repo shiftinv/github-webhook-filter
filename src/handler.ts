@@ -1,7 +1,5 @@
-import * as httpErrors from "x/http_errors";
+import { HTTPException } from "@hono/hono/http-exception";
 
-import config from "./config.ts";
-import { hasKey, verify } from "./crypto.ts";
 import filterWebhook from "./filter.ts";
 import fixupEmbeds from "./formatter.ts";
 import { UrlConfig } from "./types.d.ts";
@@ -9,55 +7,34 @@ import { parseBool, requestLog } from "./util.ts";
 import { sendWebhook } from "./webhook.ts";
 
 export default async function handle(
-    req: Request,
-): Promise<Response | [Response, Record<string, string>]> {
-    const url = new URL(req.url);
-
-    // redirect to repo if `GET /`
-    if (req.method === "GET" && config.mainRedirect && url.pathname === "/") {
-        return Response.redirect(config.mainRedirect);
-    }
-
-    // everything else should be a POST
-    if (req.method !== "POST") {
-        throw httpErrors.createError(405);
-    }
-
-    // split url into parts
-    const [, id, token] = url.pathname.split("/");
-    if (!id || !token) {
-        throw httpErrors.createError(400);
-    }
-
-    // verify signature
-    if (hasKey) {
-        const signature = url.searchParams.get("sig");
-        if (!signature) throw httpErrors.createError(400);
-        if (!(await verify(`${id}/${token}`, signature))) throw httpErrors.createError(403);
-    }
-
-    // extract data
-    const urlConfig = getUrlConfig(url.searchParams);
-    const data = await req.text();
-    const json: Record<string, any> = JSON.parse(data);
+    json: Record<string, any>,
+    headers: Record<string, string>,
+    queryParams: Record<string, string>,
+    id: string,
+    token: string,
+): Promise<[Response, Record<string, string>]> {
+    const urlConfig = getUrlConfig(queryParams);
 
     // do the thing
-    const filterReason = await filterWebhook(req.headers, json, urlConfig);
+    const filterReason = await filterWebhook(headers, json, urlConfig);
     if (filterReason !== null) {
-        const reqLog = requestLog(req.headers);
+        const reqLog = requestLog(headers);
         reqLog.debug(`handler: ignored due to '${filterReason}'`);
-        return new Response(`Ignored by webhook filter (reason: ${filterReason})`, { status: 203 });
+        return [
+            new Response(`Ignored by webhook filter (reason: ${filterReason})`, { status: 203 }),
+            {},
+        ];
     }
 
     // mutate `json` in-place (fixing codeblocks etc.)
     fixupEmbeds(json);
 
-    return await sendWebhook(id, token, req.headers, json);
+    return await sendWebhook(id, token, headers, json);
 }
 
-function getUrlConfig(params: URLSearchParams): UrlConfig {
+function getUrlConfig(params: Record<string, string>): UrlConfig {
     const config: UrlConfig = {};
-    for (const [key, value] of params) {
+    for (const [key, value] of Object.entries(params)) {
         switch (key) {
             case "sig":
                 continue;
@@ -71,7 +48,7 @@ function getUrlConfig(params: URLSearchParams): UrlConfig {
                 config.commentBurstLimit = parseInt(value);
                 break;
             default:
-                throw httpErrors.createError(418, `Unknown config option: ${key}`);
+                throw new HTTPException(418, { message: `Unknown config option: ${key}` });
         }
     }
     return config;

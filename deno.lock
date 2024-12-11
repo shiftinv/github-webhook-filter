@@ -2,6 +2,7 @@
   "version": "3",
   "packages": {
     "specifiers": {
+      "jsr:@hono/hono@^4.6.13": "jsr:@hono/hono@4.6.13",
       "jsr:@lambdalisue/github-emoji@^1.0.0": "jsr:@lambdalisue/github-emoji@1.0.0",
       "jsr:@std/assert@^0.221.0": "jsr:@std/assert@0.221.0",
       "jsr:@std/encoding@^1.0.5": "jsr:@std/encoding@1.0.5",
@@ -12,6 +13,9 @@
       "jsr:@std/path@^0.221.0": "jsr:@std/path@0.221.0"
     },
     "jsr": {
+      "@hono/hono@4.6.13": {
+        "integrity": "198970fc6facf71a88ee57aa1ed32143b56bcb0f842fa965ca3ee7d6fdd21a8e"
+      },
       "@lambdalisue/github-emoji@1.0.0": {
         "integrity": "cc6b1ae72cde7a61397c886caf4013d0cc8d1108c70459192b2a7b0cccbfef2c",
         "dependencies": [
@@ -49,30 +53,10 @@
       }
     }
   },
-  "remote": {
-    "https://deno.land/std@0.69.0/_util/assert.ts": "e1f76e77c5ccb5a8e0dbbbe6cce3a56d2556c8cb5a9a8802fc9565af72462149",
-    "https://deno.land/std@0.69.0/async/deferred.ts": "ac95025f46580cf5197928ba90995d87f26e202c19ad961bc4e3177310894cdc",
-    "https://deno.land/std@0.69.0/async/delay.ts": "35957d585a6e3dd87706858fb1d6b551cb278271b03f52c5a2cb70e65e00c26a",
-    "https://deno.land/std@0.69.0/async/mod.ts": "39f2602a005805dd1e6b9da4ee5391b14d15e8fec4fa5494a6165c599911d746",
-    "https://deno.land/std@0.69.0/async/mux_async_iterator.ts": "1352b10a5cee1821a963eb8f4f05603bd7e25f8886eaf8d1888f4b416ddccdf5",
-    "https://deno.land/std@0.69.0/async/pool.ts": "a499691231d8c249f044f69d204b479ad3af7f115e0b37342829eff076bc2450",
-    "https://deno.land/std@0.69.0/bytes/mod.ts": "b1a149ac741728db00bda9ce1a2d044f248edd5ac95e708a6cc501bfd3adb4a7",
-    "https://deno.land/std@0.69.0/datetime/formatter.ts": "a21986fb09d36164f1b1e867ea9e5bb816a907dabc768a8f0c8c44c1112f65e4",
-    "https://deno.land/std@0.69.0/datetime/mod.ts": "140c93dc33a4918230685d7cc4f098da661e4870f006f05a7853c765eff041ff",
-    "https://deno.land/std@0.69.0/datetime/tokenizer.ts": "175c06fcf866ada3cbf61b4c387b8f17dd9b22befbf299772dda1a4d53cfc22b",
-    "https://deno.land/std@0.69.0/encoding/utf8.ts": "8654fa820aa69a37ec5eb11908e20b39d056c9bf1c23ab294303ff467f3d50a1",
-    "https://deno.land/std@0.69.0/http/_io.ts": "a6108623563611e901b1128ca91aca02982af552aa7c4f39f2240cf6e6cd9ac7",
-    "https://deno.land/std@0.69.0/http/cookie.ts": "0d141ef4ff05a53602bfd06839f4a674a0dce170dc80619d67736984c8b57830",
-    "https://deno.land/std@0.69.0/http/http_status.ts": "0ecc0799a208f49452023b1b927106ba5a2c13cc6cf6666345db028239d554ab",
-    "https://deno.land/std@0.69.0/http/mod.ts": "7f2ddc904c7951757228709a2f72c5b3960dee3e81f552f21d382edfdd2a1165",
-    "https://deno.land/std@0.69.0/http/server.ts": "9f39d814950c741e0dcf0dfb9a046515f5fb342a62fbc28607c44ac5692e8a7e",
-    "https://deno.land/std@0.69.0/io/bufio.ts": "e76c5b7bf978a638aae6f62b87efde3ab7203b85902ce9b84ac8388c8c2bb104",
-    "https://deno.land/std@0.69.0/textproto/mod.ts": "ebd84342f62216af1850279d32581c51d0958e36d477c6c26c961987e6240356",
-    "https://deno.land/x/http_errors@3.0.0/deps.ts": "7fcd181f9577e1803297e42cdb58ce219d9c7087391b1e9ccc12537e23b9d68c",
-    "https://deno.land/x/http_errors@3.0.0/mod.ts": "6549778cb6616cd16884dd1f46b28211fc8ac33f9d7141e92a8eaffb48391bc1"
-  },
+  "remote": {},
   "workspace": {
     "dependencies": [
+      "jsr:@hono/hono@^4.6.13",
       "jsr:@lambdalisue/github-emoji@^1.0.0",
       "jsr:@std/encoding@^1.0.5",
       "jsr:@std/log@^0.224.11"

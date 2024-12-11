@@ -3,12 +3,12 @@ import { UrlConfig } from "./types.d.ts";
 import { requestLog, wildcardMatch } from "./util.ts";
 
 export default async function filter(
-    headers: Headers,
+    headers: Record<string, string>,
     json: any,
     config: UrlConfig,
 ): Promise<string | null> {
     const reqLog = requestLog(headers);
-    const event = headers.get("x-github-event") || "unknown";
+    const event = headers["x-github-event"] || "unknown";
     const login: string | undefined = json.sender?.login?.toLowerCase();
 
     // ignore events that Discord won't render anyway
