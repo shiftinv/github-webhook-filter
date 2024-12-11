@@ -14,8 +14,7 @@
     "imports": {
         "@hono/hono": "jsr:@hono/hono@^4.6.13",
         "@lambdalisue/github-emoji": "jsr:@lambdalisue/github-emoji@^1.0.0",
-        "@std/encoding": "jsr:@std/encoding@^1.0.5",
-        "@std/log": "jsr:@std/log@^0.224.11"
+        "@std/encoding": "jsr:@std/encoding@^1.0.5"
     },
     "unstable": [
         "kv"

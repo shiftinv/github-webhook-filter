@@ -6,10 +6,6 @@
       "jsr:@lambdalisue/github-emoji@^1.0.0": "jsr:@lambdalisue/github-emoji@1.0.0",
       "jsr:@std/assert@^0.221.0": "jsr:@std/assert@0.221.0",
       "jsr:@std/encoding@^1.0.5": "jsr:@std/encoding@1.0.5",
-      "jsr:@std/fmt@^1.0.3": "jsr:@std/fmt@1.0.3",
-      "jsr:@std/fs@^1.0.6": "jsr:@std/fs@1.0.6",
-      "jsr:@std/io@^0.225.0": "jsr:@std/io@0.225.0",
-      "jsr:@std/log@^0.224.11": "jsr:@std/log@0.224.11",
       "jsr:@std/path@^0.221.0": "jsr:@std/path@0.221.0"
     },
     "jsr": {
@@ -28,23 +24,6 @@
       "@std/encoding@1.0.5": {
         "integrity": "ecf363d4fc25bd85bd915ff6733a7e79b67e0e7806334af15f4645c569fefc04"
       },
-      "@std/fmt@1.0.3": {
-        "integrity": "97765c16aa32245ff4e2204ecf7d8562496a3cb8592340a80e7e554e0bb9149f"
-      },
-      "@std/fs@1.0.6": {
-        "integrity": "42b56e1e41b75583a21d5a37f6a6a27de9f510bcd36c0c85791d685ca0b85fa2"
-      },
-      "@std/io@0.225.0": {
-        "integrity": "c1db7c5e5a231629b32d64b9a53139445b2ca640d828c26bf23e1c55f8c079b3"
-      },
-      "@std/log@0.224.11": {
-        "integrity": "df5e5a6d6ab8bcea016a17982cd2435f65234d6618bf631925587c0b2eae2a4e",
-        "dependencies": [
-          "jsr:@std/fmt@^1.0.3",
-          "jsr:@std/fs@^1.0.6",
-          "jsr:@std/io@^0.225.0"
-        ]
-      },
       "@std/path@0.221.0": {
         "integrity": "0a36f6b17314ef653a3a1649740cc8db51b25a133ecfe838f20b79a56ebe0095",
         "dependencies": [
@@ -58,8 +37,7 @@
     "dependencies": [
       "jsr:@hono/hono@^4.6.13",
       "jsr:@lambdalisue/github-emoji@^1.0.0",
-      "jsr:@std/encoding@^1.0.5",
-      "jsr:@std/log@^0.224.11"
+      "jsr:@std/encoding@^1.0.5"
     ]
   }
 }

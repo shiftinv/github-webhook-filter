@@ -1,5 +1,3 @@
-import * as log from "@std/log";
-
 export function parseBool(s: string): boolean {
     return ["1", "true", "on", "y", "yes"].includes(s.toLowerCase());
 }
@@ -40,17 +38,17 @@ export function requestLog(headers: Record<string, string>) {
     // ugh
     // is there a better way to do this? certainly.
     // does this work? also yes.
-    const proxyLog: (func: (s: any) => string) => (msg: any) => string = (func) => {
+    const proxyLog: (func: (s: any) => void) => (msg: any) => void = (func) => {
         // FIXME: `String()` mangles objects
         return (msg) => func(prefix + String(msg));
     };
 
     return {
-        debug: proxyLog(log.debug),
-        info: proxyLog(log.info),
-        warn: proxyLog(log.warn),
-        error: proxyLog(log.error),
-        critical: proxyLog(log.critical),
+        debug: proxyLog(console.debug),
+        info: proxyLog(console.info),
+        log: proxyLog(console.log),
+        warn: proxyLog(console.warn),
+        error: proxyLog(console.error),
     };
 }
 

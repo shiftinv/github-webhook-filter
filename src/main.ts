@@ -1,27 +1,10 @@
 import { Hono } from "@hono/hono";
 import { HTTPException } from "@hono/hono/http-exception";
 import { logger } from "@hono/hono/logger";
-import * as log from "@std/log";
 
 import config from "./config.ts";
 import { hasKey, verify } from "./crypto.ts";
 import handler from "./handler.ts";
-
-function setupLogs() {
-    log.setup({
-        handlers: {
-            console: new log.ConsoleHandler("DEBUG", {
-                formatter: (rec) => `${rec.datetime.toISOString()} [${rec.levelName}] ${rec.msg}`,
-            }),
-        },
-        loggers: {
-            default: {
-                level: config.debug ? "DEBUG" : "INFO",
-                handlers: ["console"],
-            },
-        },
-    });
-}
 
 const app = new Hono();
 
@@ -68,17 +51,15 @@ app.post("/:id/:token", async (c) => {
 });
 
 if (import.meta.main) {
-    setupLogs();
-
     if (config.signKey) {
-        log.info("url signing enabled");
+        console.info("url signing enabled");
     }
 
     Deno.serve(
         {
             hostname: config.hostname,
             port: config.port,
-            onListen: () => log.info(`listening on ${config.hostname}:${config.port}`),
+            onListen: () => console.info(`listening on ${config.hostname}:${config.port}`),
         },
         app.fetch,
     );
