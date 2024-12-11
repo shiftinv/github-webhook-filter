@@ -32,14 +32,13 @@ export function wildcardMatch(pattern: string, target: string): boolean {
  * logging proxy that adds some metadata to log messages
  */
 export function requestLog(deliveryId: string | undefined) {
-    const prefix = deliveryId ? `[${deliveryId}] ` : "";
+    const prefix = deliveryId ? `[${deliveryId}]` : "";
 
     // ugh
     // is there a better way to do this? certainly.
     // does this work? also yes.
-    const proxyLog: (func: (s: any) => void) => (msg: any) => void = (func) => {
-        // FIXME: `String()` mangles objects
-        return (msg) => func(prefix + String(msg));
+    const proxyLog: (func: (...args: any[]) => void) => (...args: any[]) => void = (func) => {
+        return (...args) => func(prefix, ...args);
     };
 
     return {

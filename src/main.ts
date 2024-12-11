@@ -3,14 +3,16 @@ import { HTTPException } from "@hono/hono/http-exception";
 import { logger } from "@hono/hono/logger";
 
 import config from "./config.ts";
-import { contextMiddleware } from "./context.ts";
+import { contextMiddleware, getRequestLog } from "./context.ts";
 import { hasKey, verify } from "./crypto.ts";
 import handler from "./handler.ts";
 
 const app = new Hono();
 
-app.use(logger());
 app.use(contextMiddleware);
+
+// use context's requestlog for server logs
+app.use(logger((...args) => getRequestLog().log(...args)));
 
 if (config.mainRedirect) {
     app.get("/", (c) => {
