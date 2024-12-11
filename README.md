@@ -11,7 +11,7 @@ see [configuration](#configuration) below for more.
 ## Usage
 
 0. Host the project somewhere, for example https://deno.com/deploy. Remember to add the environment
-   variables you may want to set, see [`lib/config.ts`](./lib/config.ts).
+   variables you may want to set, see [`src/config.ts`](./src/config.ts).
 1. Create a Discord webhook (`https://discord.com/api/webhooks/1234/ABCDWXYZ`).
 2. Take the ID (`1234`) and token (`ABCDWXYZ`) from the URL, and enter
    `https://<filter_url>/1234/ABCDWXYZ` (note: no `/github`) in the GitHub webhook settings:\
