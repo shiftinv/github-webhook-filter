@@ -1,3 +1,5 @@
+import type { Context } from "@hono/hono";
+
 export function parseBool(s: string): boolean {
     return ["1", "true", "on", "y", "yes"].includes(s.toLowerCase());
 }
@@ -51,3 +53,7 @@ export function requestLog(deliveryId: string | undefined) {
 }
 
 export type RequestLog = ReturnType<typeof requestLog>;
+
+export function setMetaHeader(c: Context, key: string, value: string): void {
+    c.res.headers.set(`x-webhook-filter-${key}`, value);
+}

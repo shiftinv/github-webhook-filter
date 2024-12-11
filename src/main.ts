@@ -6,6 +6,7 @@ import config from "./config.ts";
 import { contextMiddleware, getRequestLog } from "./context.ts";
 import { hasKey, verify } from "./crypto.ts";
 import handler from "./handler.ts";
+import { setMetaHeader } from "./util.ts";
 
 const app = new Hono();
 
@@ -13,6 +14,12 @@ app.use(contextMiddleware);
 
 // use context's requestlog for server logs
 app.use(logger((...args) => getRequestLog().log(...args)));
+
+// add deploy header to responses
+app.use(async (c, next) => {
+    await next();
+    setMetaHeader(c, "deploy", config.deployId);
+});
 
 if (config.mainRedirect) {
     app.get("/", (c) => {
@@ -38,12 +45,8 @@ app.post("/:id/:token", async (c) => {
     res = new Response(res.body, res);
 
     // set metadata headers
-    meta = {
-        "deploy": config.deployId,
-        ...meta,
-    };
     for (const [key, value] of Object.entries(meta)) {
-        res.headers.set(`x-webhook-filter-${key}`, value);
+        setMetaHeader(c, key, value);
     }
 
     // remove other headers that don't make sense here
