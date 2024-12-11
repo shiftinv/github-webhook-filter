@@ -1,5 +1,6 @@
 import config from "./config.ts";
-import { requestLog, sleep } from "./util.ts";
+import { getRequestLog } from "./context.ts";
+import { sleep } from "./util.ts";
 
 export async function sendWebhook(
     id: string,
@@ -7,7 +8,7 @@ export async function sendWebhook(
     headers: Record<string, string>,
     data: Record<string, any>,
 ): Promise<[Response, Record<string, string>]> {
-    const reqLog = requestLog(headers);
+    const reqLog = getRequestLog();
     const url = `https://discord.com/api/webhooks/${id}/${token}/github?wait=1`;
     const body = JSON.stringify(data);
 

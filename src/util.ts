@@ -31,8 +31,7 @@ export function wildcardMatch(pattern: string, target: string): boolean {
 /**
  * logging proxy that adds some metadata to log messages
  */
-export function requestLog(headers: Record<string, string>) {
-    const deliveryId = headers["x-github-delivery"];
+export function requestLog(deliveryId: string | undefined) {
     const prefix = deliveryId ? `[${deliveryId}] ` : "";
 
     // ugh

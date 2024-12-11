@@ -1,13 +1,13 @@
+import { getRequestLog } from "./context.ts";
 import { getAndIncrementKV } from "./kv.ts";
 import { UrlConfig } from "./types.d.ts";
-import { requestLog, wildcardMatch } from "./util.ts";
+import { wildcardMatch } from "./util.ts";
 
 export default async function filter(
     headers: Record<string, string>,
     json: any,
     config: UrlConfig,
 ): Promise<string | null> {
-    const reqLog = requestLog(headers);
     const event = headers["x-github-event"] || "unknown";
     const login: string | undefined = json.sender?.login?.toLowerCase();
 
@@ -51,6 +51,7 @@ export default async function filter(
         if (config.commentBurstLimit && reviewId) {
             const cacheKey = `${reviewId}-${login}`;
 
+            const reqLog = getRequestLog();
             reqLog.debug(`filter: checking cache key ${cacheKey}`);
             const curr = await getAndIncrementKV(cacheKey, reqLog);
             reqLog.debug(`filter: current value: ${curr}`);

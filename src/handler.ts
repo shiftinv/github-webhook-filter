@@ -1,9 +1,10 @@
 import { HTTPException } from "@hono/hono/http-exception";
 
+import { getRequestLog } from "./context.ts";
 import filterWebhook from "./filter.ts";
 import fixupEmbeds from "./formatter.ts";
 import { UrlConfig } from "./types.d.ts";
-import { parseBool, requestLog } from "./util.ts";
+import { parseBool } from "./util.ts";
 import { sendWebhook } from "./webhook.ts";
 
 export default async function handle(
@@ -18,7 +19,7 @@ export default async function handle(
     // do the thing
     const filterReason = await filterWebhook(headers, json, urlConfig);
     if (filterReason !== null) {
-        const reqLog = requestLog(headers);
+        const reqLog = getRequestLog();
         reqLog.debug(`handler: ignored due to '${filterReason}'`);
         return [
             new Response(`Ignored by webhook filter (reason: ${filterReason})`, { status: 203 }),
