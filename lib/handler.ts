@@ -1,4 +1,5 @@
-import { httpErrors } from "../deps.ts";
+import * as httpErrors from "x/http_errors";
+
 import config from "./config.ts";
 import { hasKey, verify } from "./crypto.ts";
 import filterWebhook from "./filter.ts";

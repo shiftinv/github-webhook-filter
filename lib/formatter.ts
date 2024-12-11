@@ -1,4 +1,4 @@
-import { githubEmoji } from "../deps.ts";
+import { emojify as githubEmojify } from "@lambdalisue/github-emoji";
 
 // Empirically determined GitHub embed description limit in the Discord API.
 // Anything above this will be ellipsized :/
@@ -16,12 +16,8 @@ function ellipsizeText(s: string): string {
     return s;
 }
 
-function transformEmojis(s: string): string {
-    return githubEmoji.emojify(s);
-}
-
 const TRANSFORMS: ((s: string) => string)[] = [
-    transformEmojis,
+    githubEmojify,
     ellipsizeText,
 ];
 

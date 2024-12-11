@@ -1,4 +1,4 @@
-import { log } from "../deps.ts";
+import * as log from "@std/log";
 
 export function parseBool(s: string): boolean {
     return ["1", "true", "on", "y", "yes"].includes(s.toLowerCase());
@@ -30,10 +30,6 @@ export function wildcardMatch(pattern: string, target: string): boolean {
     return invert !== new RegExp(pattern).test(target);
 }
 
-function _getLogString(data: unknown): string {
-    return log.getLogger().asString(data);
-}
-
 /**
  * logging proxy that adds some metadata to log messages
  */
@@ -45,7 +41,8 @@ export function requestLog(headers: Headers) {
     // is there a better way to do this? certainly.
     // does this work? also yes.
     const proxyLog: (func: (s: any) => string) => (msg: any) => string = (func) => {
-        return (msg) => func(prefix + _getLogString(msg));
+        // FIXME: `String()` mangles objects
+        return (msg) => func(prefix + String(msg));
     };
 
     return {

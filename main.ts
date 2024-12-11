@@ -1,4 +1,6 @@
-import { httpErrors, log } from "./deps.ts";
+import * as log from "@std/log";
+import * as httpErrors from "x/http_errors";
+
 import config from "./lib/config.ts";
 import handler from "./lib/handler.ts";
 import { requestLog } from "./lib/util.ts";

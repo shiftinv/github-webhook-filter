@@ -1,5 +1,6 @@
+import { decodeHex, encodeHex } from "@std/encoding";
+
 import config from "./config.ts";
-import { hex } from "../deps.ts";
 
 export const hasKey = !!config.signKey;
 
@@ -13,7 +14,7 @@ async function getKey(): Promise<CryptoKey> {
 
         _signKey = await crypto.subtle.importKey(
             "raw",
-            hex.decodeHex(config.signKey),
+            decodeHex(config.signKey),
             { name: "HMAC", hash: "SHA-256" },
             false,
             ["sign", "verify"],
@@ -26,12 +27,12 @@ export async function sign(input: string): Promise<string> {
     const key = await getKey();
     const inputData = encoder.encode(input);
     const sig = await crypto.subtle.sign("HMAC", key, inputData);
-    return hex.encodeHex(sig);
+    return encodeHex(sig);
 }
 
 export async function verify(input: string, signature: string): Promise<boolean> {
     const key = await getKey();
     const inputData = encoder.encode(input);
-    const sig = hex.decodeHex(signature);
+    const sig = decodeHex(signature);
     return await crypto.subtle.verify("HMAC", key, sig, inputData);
 }

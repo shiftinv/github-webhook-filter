@@ -10,5 +10,18 @@
         "rules": {
             "exclude": ["no-explicit-any"]
         }
+    },
+    "imports": {
+        "@lambdalisue/github-emoji": "jsr:@lambdalisue/github-emoji@^1.0.0",
+        "@std/encoding": "jsr:@std/encoding@^1.0.5",
+        "@std/log": "jsr:@std/log@^0.224.11",
+        "x/http_errors": "https://deno.land/x/http_errors@3.0.0/mod.ts"
+    },
+    "unstable": [
+        "kv"
+    ],
+    "compilerOptions": {
+        "noUncheckedIndexedAccess": true,
+        "strictFunctionTypes": true
     }
 }
