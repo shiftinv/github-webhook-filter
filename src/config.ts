@@ -13,10 +13,12 @@ export default {
     debug: parseBool(get("DEBUG", "0")),
     hostname: get("HOSTNAME", "127.0.0.1"),
     port: parseInt(get("PORT", "8080")),
+
     signKey: get("SIGN_KEY", null),
     maxWebhookRetries: parseInt(get("MAX_RETRIES", "3")),
     maxWebhookRetryMs: parseInt(get("MAX_RETRY_MS", "30000")),
     mainRedirect: get("MAIN_REDIRECT", null),
+    KV_PATH: get("KV_PATH", null) ?? undefined,
 
     // set by deno deploy
     deployId: get("DENO_DEPLOYMENT_ID", "<unknown>"),

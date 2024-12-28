@@ -1,9 +1,10 @@
+import config from "./config.ts";
 import type { RequestLog } from "./util.ts";
 
 const KEY_EXPIRY = 3; // seconds
 const MAX_RETRIES = 50;
 
-const kv = await Deno.openKv();
+const kv = await Deno.openKv(config.KV_PATH);
 
 export async function getAndIncrementKV(key: string, reqLog: RequestLog): Promise<number> {
     const kvKey = ["pr-comment", key];
