@@ -1,4 +1,4 @@
-FROM denoland/deno:alpine-1.46.3
+FROM denoland/deno:alpine-2.4.5
 
 RUN mkdir /data && chown deno:deno /data
 VOLUME /data
