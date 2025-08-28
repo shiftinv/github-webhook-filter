@@ -3,6 +3,8 @@ import { getAndIncrementKV } from "./kv.ts";
 import { UrlConfig } from "./types.d.ts";
 import { wildcardMatch } from "./util.ts";
 
+const COMMON_CI_BOTS = ["coveralls[bot]", "netlify[bot]", "pre-commit-ci[bot]", "dependabot[bot]"];
+
 export default async function filter(
     headers: Record<string, string>,
     json: any,
@@ -101,15 +103,19 @@ export default async function filter(
         }
     }
 
-    // ignore bots
-    if (
-        !isExplicitlyAllowedBranch && // show bot pushes on allowed branches
-        login &&
-        ["coveralls[bot]", "netlify[bot]", "pre-commit-ci[bot]", "dependabot[bot]"].some((n) =>
-            login.includes(n)
-        )
-    ) {
-        return "bot";
+    if (login && login.endsWith("[bot]")) {
+        if (config.allowBots !== undefined) {
+            // ignore bot if matching
+            if (!wildcardMatch(config.allowBots, login.slice(0, -5))) {
+                return `bot '${login}' does not match ${JSON.stringify(config.allowBots)}`;
+            }
+        } else if (
+            // ignore some CI bots if not explicitly allowed
+            !isExplicitlyAllowedBranch && // show bot pushes on allowed branches
+            COMMON_CI_BOTS.some((n) => login.includes(n))
+        ) {
+            return "bot";
+        }
     }
 
     return null;

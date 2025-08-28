@@ -42,6 +42,15 @@ function getUrlConfig(params: Record<string, string>): UrlConfig {
             case "allowBranches":
                 config.allowBranches = value;
                 break;
+            case "allowBots": {
+                const bool = parseBool(value, false);
+                if (bool === undefined) {
+                    config.allowBots = value;
+                } else {
+                    config.allowBots = bool ? ".*" : "";
+                }
+                break;
+            }
             case "hideTags":
                 config.hideTags = parseBool(value);
                 break;

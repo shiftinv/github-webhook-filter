@@ -29,6 +29,11 @@ Additional options can be configured per URL:
   - This is case-sensitive and supports regex
   - Only full matches are considered, i.e. no substrings; `abc.*xyz` is equivalent to
     `/^(abc.*xyz)$/`
+- `allowBots`: Forward events from bots
+  - Accepts a bool (`1`, `0`, `true`, `false`) or a regex (see `allowBranches` for supported values)
+  - If unset, ignores events only from common CI bots[^1], unless the branch is explicitly allowed
 - `hideTags`: Ignore tag updates
 - `commentBurstLimit`: Ignore burst PR review comments in a short timespan, only showing the first x
   comments per review
+
+[^1]: `coveralls[bot]`, `netlify[bot]`, `pre-commit-ci[bot]`, `dependabot[bot]`

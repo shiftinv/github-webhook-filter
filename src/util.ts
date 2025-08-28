@@ -1,7 +1,14 @@
 import type { Context } from "@hono/hono";
 
-export function parseBool(s: string): boolean {
-    return ["1", "true", "on", "y", "yes"].includes(s.toLowerCase());
+export function parseBool(s: string, strict: false): boolean | undefined;
+export function parseBool(s: string, strict?: true): boolean;
+export function parseBool(s: string, strict: boolean = true): boolean | undefined {
+    s = s.toLowerCase();
+    if (["1", "true", "on", "y", "yes"].includes(s)) return true;
+    else if (["0", "false", "off", "n", "no"].includes(s)) return false;
+
+    if (strict) throw new Error(`invalid bool value: ${s}`);
+    return undefined;
 }
 
 export function sleep(ms: number): Promise<void> {
