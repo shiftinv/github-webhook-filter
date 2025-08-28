@@ -18,7 +18,7 @@ export default {
     maxWebhookRetries: parseInt(get("MAX_RETRIES", "3")),
     maxWebhookRetryMs: parseInt(get("MAX_RETRY_MS", "30000")),
     mainRedirect: get("MAIN_REDIRECT", null),
-    KV_PATH: get("KV_PATH", null) ?? undefined,
+    kvPath: get("KV_PATH", null) ?? undefined,
 
     // set by deno deploy
     deployId: get("DENO_DEPLOYMENT_ID", "<unknown>"),
