@@ -17,7 +17,7 @@ see [configuration](#configuration) below for more.
    `https://<filter_url>/1234/ABCDWXYZ` (note: no `/github`) in the GitHub webhook settings:\
    ![settings](./.github/assets/github-settings.png)
 3. Optionally add configuration parameters (see below) to the URL, e.g.
-   `?allowBranches=master,dev&hideTags=1`.
+   `?allowBranches=master|dev&hideTags=1`.
 4. ????
 5. Profit!
 
@@ -25,10 +25,10 @@ see [configuration](#configuration) below for more.
 
 Additional options can be configured per URL:
 
-- Only forward events from specific branches (`allowBranches`, simplified wildcard syntax)
-  - `abc*xyz` is equivalent to `/^(abc.*xyz)$/`
-  - `stuff,things` is equivalent to `/^(stuff|things)$/`
-  - `!oh*hi*there` is equivalent to `/^(oh.*hi.*there)$/` inverted
-- Ignore tag updates (`hideTags`)
-- Ignore burst PR review comments in a short timespan, only showing the first x comments per review
-  (`commentBurstLimit`)
+- `allowBranches`: Only forward events from specific branches
+  - This is case-sensitive and supports regex
+  - Only full matches are considered, i.e. no substrings; `abc.*xyz` is equivalent to
+    `/^(abc.*xyz)$/`
+- `hideTags`: Ignore tag updates
+- `commentBurstLimit`: Ignore burst PR review comments in a short timespan, only showing the first x
+  comments per review

@@ -8,22 +8,12 @@ export function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function _escapeRegex(pattern: string): string {
-    return pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 export function wildcardMatch(pattern: string, target: string): boolean {
     let invert = false;
     if (pattern[0] === "!") {
         invert = true;
         pattern = pattern.slice(1);
     }
-
-    // allow `*` wildcard specifier, translate to `.*` regex;
-    // escape everything else
-    pattern = pattern.split("*").map(_escapeRegex).join(".*");
-    // treat `,` as `|`
-    pattern = pattern.replaceAll(",", "|");
     // add anchors
     pattern = `^(${pattern})$`;
 
