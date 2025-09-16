@@ -1,3 +1,5 @@
+import { WebhookEvent, WebhookEventMap, WebhookEventName } from "@octokit/webhooks-types";
+
 import { getRequestLog } from "./context.ts";
 import { getAndIncrementKV } from "./kv.ts";
 import { UrlConfig } from "./types.d.ts";
@@ -5,12 +7,25 @@ import { wildcardMatch } from "./util.ts";
 
 const COMMON_CI_BOTS = ["coveralls[bot]", "netlify[bot]", "pre-commit-ci[bot]", "dependabot[bot]"];
 
+function isGitHubEvent<T extends WebhookEventName>(
+    _data: WebhookEvent,
+    eventType: string,
+    expected: T,
+): _data is WebhookEventMap[T] {
+    return eventType === expected;
+}
+
 export default async function filter(
     headers: Record<string, string>,
-    json: any,
+    json: WebhookEvent,
     config: UrlConfig,
 ): Promise<string | null> {
     const event = headers["x-github-event"] || "unknown";
+
+    if (!("sender" in json)) {
+        // Discord always requires a sender (most events have this, but a handful of them don't)
+        return "missing sender";
+    }
     const login: string | undefined = json.sender?.login?.toLowerCase();
 
     // ignore events that Discord won't render anyway
@@ -20,7 +35,7 @@ export default async function filter(
 
     // ignore all PR actions except "opened", "closed", "reopened"
     if (
-        event === "pull_request" && json.action &&
+        isGitHubEvent(json, event, "pull_request") &&
         !["opened", "closed", "reopened"].includes(json.action)
     ) {
         return `no-op PR action '${json.action}'`;
@@ -28,28 +43,28 @@ export default async function filter(
 
     // ignore all issue actions except "opened", "deleted", "closed", "reopened", "transferred"
     if (
-        event === "issues" && json.action &&
+        isGitHubEvent(json, event, "issues") &&
         !["opened", "deleted", "closed", "reopened", "transferred"].includes(json.action)
     ) {
         return `no-op issue action '${json.action}'`;
     }
 
     // ignore some PR review actions
-    if (event === "pull_request_review") {
+    if (isGitHubEvent(json, event, "pull_request_review")) {
         // ignore edit/dismiss actions
         if (json.action !== "submitted") return `no-op PR review action '${json.action}'`;
 
         // if comment (not approval or changes requested), ignore empty review body
-        if (json.review?.state === "commented" && !json.review?.body) return "empty PR review";
+        if (json.review.state === "commented" && !json.review.body) return "empty PR review";
     }
 
     // ignore some PR comment events
-    if (event === "pull_request_review_comment") {
+    if (isGitHubEvent(json, event, "pull_request_review_comment")) {
         // ignore edit/delete actions
         if (json.action !== "created") return `no-op PR comment action '${json.action}'`;
 
         // check if more than x comments on a PR review in a short timespan
-        const reviewId: number = json.comment?.pull_request_review_id;
+        const reviewId: number = json.comment.pull_request_review_id;
         if (config.commentBurstLimit && reviewId) {
             const cacheKey = `${reviewId}-${login}`;
 
@@ -66,7 +81,7 @@ export default async function filter(
 
     let refType: "branch" | "tag" | undefined;
     let ref: string | undefined;
-    if (event === "push") {
+    if (isGitHubEvent(json, event, "push")) {
         // ignore branch/tag push
         const refMatch = /^refs\/([^\/]+)\/(.+)$/.exec(json.ref);
         if (refMatch) {
@@ -75,7 +90,7 @@ export default async function filter(
                 : (refMatch[1] == "tags" ? "tag" : undefined);
             ref = refMatch[2];
         }
-    } else if (["create", "delete"].includes(event)) {
+    } else if (isGitHubEvent(json, event, "create") || isGitHubEvent(json, event, "delete")) {
         // ignore creation/deletion of branch/tag
         refType = json.ref_type;
         ref = json.ref;

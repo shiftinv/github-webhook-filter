@@ -14,6 +14,7 @@
     "imports": {
         "@hono/hono": "jsr:@hono/hono@^4.9.4",
         "@lambdalisue/github-emoji": "jsr:@lambdalisue/github-emoji@^1.0.0",
+        "@octokit/webhooks-types": "npm:@octokit/webhooks-types@^7.6.1",
         "@std/encoding": "jsr:@std/encoding@^1.0.10"
     },
     "unstable": [

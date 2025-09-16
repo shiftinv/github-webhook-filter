@@ -1,4 +1,5 @@
 import { HTTPException } from "@hono/hono/http-exception";
+import { WebhookEvent } from "@octokit/webhooks-types";
 
 import { getRequestLog } from "./context.ts";
 import filterWebhook from "./filter.ts";
@@ -17,7 +18,7 @@ export default async function handle(
     const urlConfig = getUrlConfig(queryParams);
 
     // do the thing
-    const filterReason = await filterWebhook(headers, json, urlConfig);
+    const filterReason = await filterWebhook(headers, json as WebhookEvent, urlConfig);
     if (filterReason !== null) {
         const reqLog = getRequestLog();
         reqLog.debug(`handler: ignored due to '${filterReason}'`);
