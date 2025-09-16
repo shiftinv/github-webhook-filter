@@ -1,6 +1,7 @@
 import { Hono } from "@hono/hono";
 import { HTTPException } from "@hono/hono/http-exception";
 import { logger } from "@hono/hono/logger";
+import { WebhookEvent } from "@octokit/webhooks-types";
 
 import config from "../config.ts";
 import { contextMiddleware, getRequestLog } from "./context.ts";
@@ -39,7 +40,7 @@ app.post("/:id/:token", async (c) => {
         }
     }
 
-    const data = await c.req.json();
+    const data = await c.req.json() as WebhookEvent;
     let [res, meta] = await handler(data, c.req.header(), c.req.query(), id, token);
 
     // clone response to make headers mutable

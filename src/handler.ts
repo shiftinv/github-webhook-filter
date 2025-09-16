@@ -9,7 +9,7 @@ import { UrlConfig } from "./types.d.ts";
 import { parseBool } from "./util.ts";
 
 export default async function handle(
-    json: Record<string, any>,
+    json: WebhookEvent,
     headers: Record<string, string>,
     queryParams: Record<string, string>,
     id: string,
@@ -18,7 +18,7 @@ export default async function handle(
     const urlConfig = getUrlConfig(queryParams);
 
     // do the thing
-    const filterReason = await filterWebhook(headers, json as WebhookEvent, urlConfig);
+    const filterReason = await filterWebhook(headers, json, urlConfig);
     if (filterReason !== null) {
         const reqLog = getRequestLog();
         reqLog.debug(`handler: ignored due to '${filterReason}'`);
