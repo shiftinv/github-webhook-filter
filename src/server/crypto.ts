@@ -1,6 +1,6 @@
 import { decodeHex, encodeHex } from "@std/encoding";
 
-import config from "./config.ts";
+import config from "../config.ts";
 
 export const hasKey = !!config.signKey;
 

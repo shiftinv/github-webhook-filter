@@ -1,12 +1,12 @@
 import { HTTPException } from "@hono/hono/http-exception";
 import { WebhookEvent } from "@octokit/webhooks-types";
 
-import { getRequestLog } from "./context.ts";
-import filterWebhook from "./filter.ts";
-import fixupEmbeds from "./formatter.ts";
+import fixupEmbeds from "./discord/formatter.ts";
+import { sendWebhook } from "./discord/webhook.ts";
+import filterWebhook from "./filter/index.ts";
+import { getRequestLog } from "./server/context.ts";
 import { UrlConfig } from "./types.d.ts";
 import { parseBool } from "./util.ts";
-import { sendWebhook } from "./webhook.ts";
 
 export default async function handle(
     json: Record<string, any>,

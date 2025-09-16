@@ -1,7 +1,7 @@
 import { createMiddleware } from "@hono/hono/factory";
 import { AsyncLocalStorage } from "node:async_hooks";
 
-import { RequestLog, requestLog } from "./util.ts";
+import { RequestLog, requestLog } from "../util.ts";
 
 interface ContextData {
     requestLog: RequestLog;

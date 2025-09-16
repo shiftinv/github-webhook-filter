@@ -1,5 +1,5 @@
-import config from "./config.ts";
-import type { RequestLog } from "./util.ts";
+import config from "../config.ts";
+import type { RequestLog } from "../util.ts";
 
 const KEY_EXPIRY = 3; // seconds
 const MAX_RETRIES = 50;

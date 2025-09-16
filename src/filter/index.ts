@@ -1,9 +1,9 @@
 import { WebhookEvent, WebhookEventMap, WebhookEventName } from "@octokit/webhooks-types";
 
-import { getRequestLog } from "./context.ts";
 import { getAndIncrementKV } from "./kv.ts";
-import { UrlConfig } from "./types.d.ts";
-import { wildcardMatch } from "./util.ts";
+import { getRequestLog } from "../server/context.ts";
+import { UrlConfig } from "../types.d.ts";
+import { wildcardMatch } from "../util.ts";
 
 const COMMON_CI_BOTS = ["coveralls[bot]", "netlify[bot]", "pre-commit-ci[bot]", "dependabot[bot]"];
 

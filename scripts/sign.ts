@@ -1,4 +1,4 @@
-import { sign } from "../src/crypto.ts";
+import { sign } from "../src/server/crypto.ts";
 
 if (import.meta.main) {
     const arg = Deno.args[0] ?? "";

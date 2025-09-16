@@ -1,6 +1,6 @@
-import config from "./config.ts";
-import { getRequestLog } from "./context.ts";
-import { sleep } from "./util.ts";
+import config from "../config.ts";
+import { getRequestLog } from "../server/context.ts";
+import { sleep } from "../util.ts";
 
 export async function sendWebhook(
     id: string,
