@@ -28,8 +28,8 @@ export default async function handle(
         ];
     }
 
-    // mutate `json` in-place (fixing codeblocks etc.)
-    fixupEmbeds(json);
+    // mutates `json` in-place (fixing codeblocks etc.)
+    json = fixupEmbeds(json);
 
     return await sendWebhook(id, token, headers, json);
 }

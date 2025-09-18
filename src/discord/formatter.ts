@@ -1,4 +1,5 @@
 import { emojify as githubEmojify } from "@lambdalisue/github-emoji";
+import { WebhookEvent } from "@octokit/webhooks-types";
 
 // Empirically determined GitHub embed description limit in the Discord API.
 // Anything above this will be ellipsized :/
@@ -21,7 +22,9 @@ const TRANSFORMS: ((s: string) => string)[] = [
     ellipsizeText,
 ];
 
-export default function fixupEmbeds(data: Record<string, any>): void {
+export default function fixupEmbeds(data: WebhookEvent): WebhookEvent {
+    // upcast because properly typing union keys is a nightmare (or just impossible?)
+    const dataRecord = data as Record<string, any>;
     for (
         const field of [
             // issue
@@ -38,10 +41,12 @@ export default function fixupEmbeds(data: Record<string, any>): void {
             "answer",
         ]
     ) {
-        if (data[field]?.body) {
+        if (dataRecord[field]?.body) {
             for (const transform of TRANSFORMS) {
-                data[field].body = transform(data[field].body);
+                dataRecord[field].body = transform(dataRecord[field].body);
             }
         }
     }
+
+    return data;
 }
