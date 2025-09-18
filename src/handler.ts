@@ -17,8 +17,13 @@ export default async function handle(
 ): Promise<[Response, Record<string, string>]> {
     const urlConfig = getUrlConfig(queryParams);
 
+    const eventType = headers["x-github-event"];
+    if (!eventType) {
+        throw new HTTPException(418, { message: `Missing x-github-event` });
+    }
+
     // do the thing
-    const filterReason = await filterWebhook(headers, json, urlConfig);
+    const filterReason = await filterWebhook(json, eventType, urlConfig);
     if (filterReason !== null) {
         const reqLog = getRequestLog();
         reqLog.debug(`handler: ignored due to '${filterReason}'`);

@@ -1,27 +1,17 @@
-import { WebhookEvent, WebhookEventMap, WebhookEventName } from "@octokit/webhooks-types";
+import { WebhookEvent } from "@octokit/webhooks-types";
 
 import { getAndIncrementKV } from "./kv.ts";
 import { getRequestLog } from "../server/context.ts";
 import { UrlConfig } from "../types.d.ts";
-import { wildcardMatch } from "../util.ts";
+import { isGitHubEvent, wildcardMatch } from "../util.ts";
 
 const COMMON_CI_BOTS = ["coveralls[bot]", "netlify[bot]", "pre-commit-ci[bot]", "dependabot[bot]"];
 
-function isGitHubEvent<T extends WebhookEventName>(
-    _data: WebhookEvent,
-    eventType: string,
-    expected: T,
-): _data is WebhookEventMap[T] {
-    return eventType === expected;
-}
-
 export default async function filter(
-    headers: Record<string, string>,
     json: WebhookEvent,
+    event: string,
     config: UrlConfig,
 ): Promise<string | null> {
-    const event = headers["x-github-event"] || "unknown";
-
     if (!("sender" in json)) {
         // Discord always requires a sender (most events have this, but a handful of them don't)
         return "missing sender";

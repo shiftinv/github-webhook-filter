@@ -1,4 +1,5 @@
 import type { Context } from "@hono/hono";
+import { WebhookEvent, WebhookEventMap, WebhookEventName } from "@octokit/webhooks-types";
 
 export function parseBool(s: string, strict: false): boolean | undefined;
 export function parseBool(s: string, strict?: true): boolean;
@@ -53,4 +54,12 @@ export type RequestLog = ReturnType<typeof requestLog>;
 
 export function setMetaHeader(c: Context, key: string, value: string): void {
     c.res.headers.set(`x-webhook-filter-${key}`, value);
+}
+
+export function isGitHubEvent<T extends WebhookEventName>(
+    _data: WebhookEvent,
+    eventType: string,
+    expected: T,
+): _data is WebhookEventMap[T] {
+    return eventType === expected;
 }
