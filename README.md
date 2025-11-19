@@ -17,9 +17,7 @@ see [configuration](#configuration) below for more.
    `https://<filter_url>/1234/ABCDWXYZ` (note: no `/github`) in the GitHub webhook settings:\
    ![settings](./.github/assets/github-settings.png)
 3. Optionally add configuration parameters (see below) to the URL, e.g.
-   `?allowBranches=master|dev&hideTags=1`.
-4. ????
-5. Profit!
+   `?allowBranches=master|dev&hideTags=1`
 
 ## Configuration
 
